@@ -1,3 +1,9 @@
-Applying on my DSP course
-## DDS 
-Direct Digital Synthesis to genrate the input signals at any frequency and amplitude  
+# DSP cores
+## 1. DDS 
+Direct Digital Synthesis to generate the input signals at any frequency and amplitude  
+## Architecture  
+### 1. DDS core:
+![DDS](DDS.drawio.png)
+### 2. DDS Registers:
+### 3. Bus interface 
+

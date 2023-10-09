@@ -1,14 +1,14 @@
 // add the feedback muxes controlled by start
 module dds (
-    input                           clk             ,
-    input                           a_rst_n         ,
+    input                               clk             ,
+    input                               a_rst_n         ,
 
-    input                           i_dds_rst       ,
-    input                           i_dds_start     ,
-    input       [8:0]               i_dds_addrs     ,
+    input                               i_dds_rst       ,
+    input                               i_dds_start     ,
+    input           [8:0]               i_dds_addrs     ,
 
-    input       [SIG_WIDTH-1:0]     i_dds_fifo_data , 
-    output      [SIG_WIDTH-1:0]     o_signal        
+    input   signed  [SIG_WIDTH-1:0]     i_dds_fifo_data , 
+    output  signed  [SIG_WIDTH-1:0]     o_signal        
 );
 
 parameter 	SIG_WIDTH		=	16	;
@@ -16,11 +16,13 @@ parameter   THETAS  =    0;
 parameter   DELTAS  =    1;
 parameter   AMPLS   =    2;
 
-logic                   thetas_en ,     deltas_en   ,   ampls_en    ;
-logic [SIG_WIDTH-1:0]   thetas_in ,     deltas_in   ,   ampls_in    ; 
-logic [SIG_WIDTH-1:0]   thetas_out,     deltas_out  ,   ampls_out   ;
-logic [SIG_WIDTH-1:0]   theta_reg ,     deltas_reg  ,   ampls_reg   ;
-logic [SIG_WIDTH-1:0]   sin_index ,     sin_out     ;
+logic                                   thetas_en ,     deltas_en   ,   ampls_en        ;
+
+logic   signed      [SIG_WIDTH-1:0]     thetas_in ,     deltas_in   ,   ampls_in        ; 
+logic   signed      [SIG_WIDTH-1:0]     thetas_out,     deltas_out  ,   ampls_out       ;
+logic   signed      [SIG_WIDTH-1:0]     theta_reg ,     deltas_reg  ,   ampls_reg   ,   ampls_reg_dly   ;
+logic               [SIG_WIDTH-1:0]     sin_index ,     sin_out     ,   sin_index_temp  ;
+
 
 always_comb begin : fifo_addrs_decoder
     thetas_en   =   0;
@@ -90,18 +92,17 @@ begin
     end
     else
     begin
-        theta_reg   <=   thetas_out  ;
-        deltas_reg  <=   deltas_out  ;      
-        ampls_reg   <=   ampls_out   ;
-        
+        theta_reg       <=  thetas_out  ;
+        deltas_reg      <=  deltas_out  ;      
+        ampls_reg_dly   <=  ampls_reg   ;
+        ampls_reg       <=  ampls_out   ;    
     end
 end
 
-//double check this should be the top 8  MSBs
-assign sin_index = theta_reg + deltas_reg  ; 
+assign  sin_index_temp  = theta_reg + deltas_reg  ; 
+assign  sin_index       = sin_index_temp[SIG_WIDTH-1:SIG_WIDTH-8] ;
 
-
-sin_lut  lut                // out is flopped reslove this
+sin_lut  lut                
 (
 	.clk    (clk)           ,
     .addr   (sin_index)     , 
@@ -116,7 +117,7 @@ shift_reg ampls_fifo (
     .sr_out (ampls_out)
 );
 
-assign  o_signal = ampls_reg * sin_out ;
+assign  o_signal = $signed(ampls_reg_dly) * $signed(sin_out) ;
 
 
 endmodule
