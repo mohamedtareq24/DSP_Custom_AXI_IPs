@@ -1,3 +1,5 @@
+// add the feedback muxes controlled by start
+
 module dds (
     input                           clk             ,
     input                           a_rst_n         ,
