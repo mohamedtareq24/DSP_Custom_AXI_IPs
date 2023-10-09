@@ -1,14 +1,14 @@
 // add the feedback muxes controlled by start
 module dds (
-    input                               clk             ,
-    input                               a_rst_n         ,
+    input                                       clk             ,
+    input                                       a_rst_n         ,
 
-    input                               i_dds_rst       ,
-    input                               i_dds_start     ,
-    input           [8:0]               i_dds_addrs     ,
+    input                                       i_dds_rst       ,
+    input                                       i_dds_start     ,
+    input                 [8:0]                 i_dds_addrs     ,
 
-    input   signed  [SIG_WIDTH-1:0]     i_dds_fifo_data , 
-    output  signed  [SIG_WIDTH-1:0]     o_signal        
+    input   logic signed  [SIG_WIDTH-1:0]       i_dds_fifo_data , 
+    output  logic signed  [SIG_WIDTH-1:0]       o_signal        
 );
 
 parameter 	SIG_WIDTH		=	16	;
@@ -32,11 +32,14 @@ always_comb begin : fifo_addrs_decoder
     ampls_en    =   0;
     ampls_in    =   0;
     
-    if (i_dds_start)    
+    if (i_dds_start)    /// buffer circulats the data 
     begin
         thetas_en   =   1;
         deltas_en   =   1;
         ampls_en    =   1;
+        thetas_in   =   thetas_out  ;
+        deltas_in   =   deltas_out  ;
+        ampls_in    =   ampls_out   ;
     end
     else
     begin
@@ -60,6 +63,7 @@ always_comb begin : fifo_addrs_decoder
     end
 end
 
+
 shift_reg thetas_fifo (
     .clk    (clk)           ,
     .rst    (i_dds_rst)     ,
@@ -80,15 +84,17 @@ always_ff @( posedge clk or negedge a_rst_n )
 begin
     if (!a_rst_n)
     begin
-        theta_reg   <=  0;
-        deltas_reg  <=  0;
-        ampls_reg   <=  0;
+        theta_reg       <=  0;
+        deltas_reg      <=  0;
+        ampls_reg       <=  0;
+        ampls_reg_dly   <=  0;
     end
     else if (i_dds_rst)
     begin
-        theta_reg   <=  0;
-        deltas_reg  <=  0;
-        ampls_reg   <=  0;
+        theta_reg       <=  0;
+        deltas_reg      <=  0;
+        ampls_reg       <=  0;
+        ampls_reg_dly   <=  0;
     end
     else
     begin
@@ -117,7 +123,14 @@ shift_reg ampls_fifo (
     .sr_out (ampls_out)
 );
 
-assign  o_signal = $signed(ampls_reg_dly) * $signed(sin_out) ;
-
+always_ff @(posedge clk or negedge a_rst_n)
+begin
+    if (!a_rst_n)
+        o_signal    <=  0;
+    else if (rst)
+        o_signal    <=  0
+    else
+        o_signal = $signed(ampls_reg_dly) * $signed(sin_out) ;
+end
 
 endmodule
