@@ -10,7 +10,7 @@ module sin_lut
 );
 
 	// Declare the ROM variable
-	reg [SIG_WIDTH-1:0] rom[255:0];
+	(*keep = 1*) reg [SIG_WIDTH-1:0] rom[255:0];
 
 	// Initialize the ROM with $readmemb.  Put the memory contents
 	// in the file single_port_rom_init.txt.  Without this file,

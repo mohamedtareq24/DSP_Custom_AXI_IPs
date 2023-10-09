@@ -2,7 +2,7 @@ module dds (
     input                           clk             ,
     input                           a_rst_n         ,
 
-    input                           i_rst           ,
+    input                           i_dds_rst       ,
     input                           i_dds_start     ,
     input                           i_dds_addrs     ,
 
@@ -10,6 +10,7 @@ module dds (
     output      [SIG_WIDTH-1:0]     o_signal                       // DDS output
 );
 
+parameter 	SIG_WIDTH		=	16	;
 parameter   THETAS  =    0;
 parameter   DELTAS  =    1;
 parameter   AMPLS   =    2;
@@ -58,7 +59,7 @@ end
 
 shift_reg thetas_fifo (
     .clk    (clk)           ,
-    .rst    (rst)           ,
+    .rst    (i_dds_rst)     ,
     .en     (thetas_en)     ,
     .sr_in  (thetas_in)     ,
     .sr_out (thetas_out)    
@@ -66,13 +67,13 @@ shift_reg thetas_fifo (
 
 shift_reg deltas_fifo (
     .clk    (clk)           ,
-    .rst    (rst)           ,
+    .rst    (i_dds_rst)     ,
     .en     (deltas_en)     ,
     .sr_in  (deltas_in)     ,
     .sr_out (deltas_out)
 );
 
-always_ff @( posedge gated_clk or negedge a_rst_n ) 
+always_ff @( posedge clk or negedge a_rst_n ) 
 begin
     if (!a_rst_n)
     begin
@@ -80,7 +81,7 @@ begin
         deltas_reg  <=  0;
         ampls_reg   <=  0;
     end
-    else if (rst)
+    else if (i_dds_rst)
     begin
         theta_reg   <=  0;
         deltas_reg  <=  0;
@@ -97,8 +98,8 @@ end
 
 assign sin_index = theta_reg + deltas_reg  ; 
 
-(* syn_keep = "yes" *)
-sin_lut #(parameter SIG_WIDTH = 16) lut
+
+sin_lut  lut
 (
 	.clk    (clk)           ,
     .addr   (sin_index)     , 
@@ -107,7 +108,7 @@ sin_lut #(parameter SIG_WIDTH = 16) lut
 
 shift_reg ampls_fifo (
     .clk    (clk)           ,
-    .rst    (rst)           ,
+    .rst    (i_dds_rst)     ,
     .en     (ampls_en)      ,
     .sr_in  (ampls_in)      ,
     .sr_out (ampls_out)
