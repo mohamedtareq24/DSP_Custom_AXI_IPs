@@ -4,10 +4,10 @@ module dds (
 
     input                           i_dds_rst       ,
     input                           i_dds_start     ,
-    input                           i_dds_addrs     ,
+    input       [8:0]               i_dds_addrs     ,
 
     input       [SIG_WIDTH-1:0]     i_dds_fifo_data , 
-    output      [SIG_WIDTH-1:0]     o_signal                       // DDS output
+    output      [SIG_WIDTH-1:0]     o_signal        
 );
 
 parameter 	SIG_WIDTH		=	16	;
@@ -99,7 +99,7 @@ end
 assign sin_index = theta_reg + deltas_reg  ; 
 
 
-sin_lut  lut
+sin_lut  lut                // out is flopped reslove this
 (
 	.clk    (clk)           ,
     .addr   (sin_index)     , 
@@ -114,7 +114,7 @@ shift_reg ampls_fifo (
     .sr_out (ampls_out)
 );
 
-assign  o_signal = ampls_out * sin_out ;
+assign  o_signal = ampls_reg * sin_out ;
 
 
 endmodule
