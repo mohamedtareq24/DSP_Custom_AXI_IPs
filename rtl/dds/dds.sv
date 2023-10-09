@@ -1,5 +1,4 @@
 // add the feedback muxes controlled by start
-
 module dds (
     input                           clk             ,
     input                           a_rst_n         ,
@@ -98,6 +97,7 @@ begin
     end
 end
 
+//double check this should be the top 8  MSBs
 assign sin_index = theta_reg + deltas_reg  ; 
 
 
