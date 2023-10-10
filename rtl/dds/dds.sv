@@ -37,9 +37,9 @@ always_comb begin : fifo_addrs_decoder
         thetas_en   =   1;
         deltas_en   =   1;
         ampls_en    =   1;
-        thetas_in   =   thetas_out  ;
-        deltas_in   =   deltas_out  ;
-        ampls_in    =   ampls_out   ;
+        // thetas_in   =   thetas_out  ;
+        // deltas_in   =   deltas_out  ;
+        // ampls_in    =   ampls_out   ;
     end
     else
     begin
@@ -127,10 +127,10 @@ always_ff @(posedge clk or negedge a_rst_n)
 begin
     if (!a_rst_n)
         o_signal    <=  0;
-    else if (rst)
-        o_signal    <=  0
+    else if (i_dds_rst)
+        o_signal    <=  0;
     else
-        o_signal = $signed(ampls_reg_dly) * $signed(sin_out) ;
+        o_signal = $signed(ampls_reg_dly) * $signed(sin_out) ; /// this is questionable 
 end
 
 endmodule
