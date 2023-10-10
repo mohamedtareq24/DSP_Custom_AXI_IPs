@@ -37,9 +37,9 @@ always_comb begin : fifo_addrs_decoder
         thetas_en   =   1;
         deltas_en   =   1;
         ampls_en    =   1;
-        // thetas_in   =   thetas_out  ;
-        // deltas_in   =   deltas_out  ;
-        // ampls_in    =   ampls_out   ;
+        thetas_in   =   thetas_out  ;
+        deltas_in   =   deltas_out  ;
+        ampls_in    =   ampls_out   ;
     end
     else
     begin
