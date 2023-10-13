@@ -123,14 +123,19 @@ shift_reg ampls_fifo (
     .sr_out (ampls_out)
 );
 
+assign  mult_out = $signed(ampls_reg_dly) * $signed(sin_out) ;
+
+// accumlator to superimpose the signals 
 always_ff @(posedge clk or negedge a_rst_n)
 begin
     if (!a_rst_n)
         o_signal    <=  0;
     else if (i_dds_rst)
         o_signal    <=  0;
+    else if (accumltr_rst)
+        o_signal    <=  0;
     else
-        o_signal = $signed(ampls_reg_dly) * $signed(sin_out) ; /// this is questionable 
+        o_signal <= o_signal + mult_out/// this is questionable 
 end
 
 endmodule
