@@ -8,8 +8,8 @@ deltas  =   [15,30,45,90] ;
 ampls   =   [1,1,1,1] ;
 sum = 0 ;
 
-for  i = 1:256
-    for index = 1:2
+for  i = 1:32
+    for index = 1:4
         %adder
         lut_index               =   thetas(index) + deltas(index);
         %multiplier and LUT
