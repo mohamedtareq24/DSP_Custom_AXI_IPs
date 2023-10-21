@@ -4,6 +4,14 @@ module shift_reg (
     input                                   en          ,
 
     input       [SIG_WIDTH-1:0]             sr_in       ,
+
+    output      [SIG_WIDTH-1:0]             sr_1        ,
+    output      [SIG_WIDTH-1:0]             sr_8        ,
+    output      [SIG_WIDTH-1:0]             sr_16       ,
+    output      [SIG_WIDTH-1:0]             sr_32       ,
+    output      [SIG_WIDTH-1:0]             sr_64       ,
+    output      [SIG_WIDTH-1:0]             sr_128      ,
+    output      [SIG_WIDTH-1:0]             sr_256      ,
     output      [SIG_WIDTH-1:0]             sr_out
 );
 
@@ -32,8 +40,14 @@ begin
     end
 
 end
-assign sr_out = sr[DEPTH-1];
-
+assign  sr_out  =   sr[DEPTH-1];
+assign  sr_1    =   sr[0]   ;
+assign  sr_8    =   sr[7]   ;
+assign  sr_16   =   sr[15]  ;
+assign  sr_32   =   sr[31]  ;
+assign  sr_64   =   sr[63]  ;
+assign  sr_128  =   sr[127] ;
+assign  sr_256  =   sr[255] ;
 endmodule
 
 
