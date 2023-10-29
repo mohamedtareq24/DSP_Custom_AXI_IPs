@@ -110,9 +110,9 @@ begin
             thetas_feedback_tap     =   thetas_tap256   ;
         end
         default:begin
-            deltas_feedback_tap     =   deltas_out  ;
-            ampls_feedback_tap      =   ampls_out   ; 
-            thetas_feedback_tap     =   thetas_out  ;
+            deltas_feedback_tap     =   deltas_tap512   ;
+            ampls_feedback_tap      =   ampls_tap512    ; 
+            thetas_feedback_tap     =   thetas_tap512   ;
         end 
     endcase
 end
