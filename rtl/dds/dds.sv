@@ -10,7 +10,6 @@ module dds (
     input                   [31:0]              i_dds_deltas_reg    ,
     input                   [31:0]              i_dds_ampls_reg     ,
     input                   [31:0]              i_dds_lngth_reg     ,
-    input                   [31:0]              i_dds_clk_div_reg   ,
     //sample timer 
     input                                       i_dds_sample_en    ,        // updates the sample 
     // DDS output 
@@ -23,8 +22,8 @@ parameter   THETAS          =    0;
 parameter   DELTAS          =    1;
 parameter   AMPLS           =    2;
 
-parameter   DDS_RST_BIT     =    0;
-parameter   DDS_STRT_BIT    =    1;
+parameter   CTRL_RST_BIT     =    0;
+parameter   CTRL_STRT_BIT    =    1;
 
 logic                                   thetas_en ,     deltas_en   ,   ampls_en        ;
 logic   signed      [SIG_WIDTH-1:0]     thetas_in ,     deltas_in   ,   ampls_in        ; 
@@ -67,8 +66,8 @@ logic   [SIG_WIDTH-1:0] ampls_tap128        ;
 logic   [SIG_WIDTH-1:0] ampls_tap256        ;
 logic   [SIG_WIDTH-1:0] ampls_tap512        ;
 
-assign  dds_rst         =   i_dds_ctrl_reg [DDS_RST_BIT]  ;
-assign  dds_start       =   i_dds_ctrl_reg [DDS_STRT_BIT] ;
+assign  dds_rst         =   i_dds_ctrl_reg [CTRL_RST_BIT]  ;
+assign  dds_start       =   i_dds_ctrl_reg [CTRL_STRT_BIT] ;
 
 //// tap mux 
 always @ (*) 
