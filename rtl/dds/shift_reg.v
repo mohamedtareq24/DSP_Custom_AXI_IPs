@@ -40,14 +40,14 @@ begin
     end
 
 end
-assign  sr_out  =   sr[DEPTH-1];
-assign  sr_1    =   sr[0]   ;
-assign  sr_8    =   sr[7]   ;
-assign  sr_16   =   sr[15]  ;
-assign  sr_32   =   sr[31]  ;
-assign  sr_64   =   sr[63]  ;
-assign  sr_128  =   sr[127] ;
-assign  sr_256  =   sr[255] ;
+assign  sr_out  =   sr[DEPTH-1] ;
+assign  sr_1    =   sr[0]       ;
+assign  sr_8    =   sr[7]       ;
+assign  sr_16   =   sr[15]      ;
+assign  sr_32   =   sr[31]      ;
+assign  sr_64   =   sr[63]      ;
+assign  sr_128  =   sr[127]     ;
+assign  sr_256  =   sr[255]     ;
 endmodule
 
 
