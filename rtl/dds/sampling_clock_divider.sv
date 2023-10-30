@@ -35,7 +35,7 @@ always @(posedge clk or negedge a_rst_n) begin
             begin
             counter <= (i_ckdivider_clk_div_reg >> 1) - 1 ;
             o_ckdivider_sample_en <= ~  o_ckdivider_sample_en   ;
-            end
+        end
     end
         
 
