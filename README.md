@@ -4,6 +4,7 @@ Direct Digital Synthesis to generate the input signals at any frequency and ampl
 ## Architecture  
 ### 1. DDS core:
 ![DDS](DDS.drawio.png)
+
 ### 2. DDS Registers:
 
 #### 1. ***CTRL Register***
@@ -40,4 +41,4 @@ Direct Digital Synthesis to generate the input signals at any frequency and ampl
 ### 3. Bus interface 
 
 ### example use
-![EX](figures/ex1.svg)
+![EX](figures/example1.png)
