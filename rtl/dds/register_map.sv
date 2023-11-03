@@ -6,10 +6,10 @@ module register_map (
     input                                       clk                     ,
     input                                       a_rst_n                 ,
 // Bus 
-    input                                       i_reg_map_write         ,
-    input                                       i_reg_map_read          ,
-    input                 [31:0]                i_reg_map_addrs         ,
-    input   logic signed  [SIG_WIDTH-1:0]       i_reg_map_writedata     ,
+    input   logic                               i_reg_map_write         ,
+    input   logic                               i_reg_map_read          ,
+    input   logic         [31:0]                i_reg_map_addrs         ,
+    input   logic         [31:0]                i_reg_map_writedata     ,
     output  logic         [31:0]                o_reg_map_readdata      ,
 
 // core 

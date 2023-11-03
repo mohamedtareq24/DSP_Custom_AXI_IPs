@@ -17,7 +17,8 @@ parameter   CTRL_STRT_BIT       =       1 ;
 
 logic [31:0]  counter ;
 
-always @(posedge clk or negedge a_rst_n) begin
+always @(posedge clk or negedge a_rst_n) 
+begin
     if (!a_rst_n)
     begin
         counter <= 0;
@@ -37,8 +38,6 @@ always @(posedge clk or negedge a_rst_n) begin
             o_ckdivider_sample_en <= ~  o_ckdivider_sample_en   ;
         end
     end
-        
-
 end
 
 
