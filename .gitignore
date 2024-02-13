@@ -1,3 +1,4 @@
-fpga/Quartus
+fpga/
 *.bak
 .vscode/settings.json
+chat.rapidgpt

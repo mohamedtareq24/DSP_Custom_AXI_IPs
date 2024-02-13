@@ -1,1 +1,1 @@
-# Applying what learned in my DSP course
+# Applying what was learned in my DSP course
