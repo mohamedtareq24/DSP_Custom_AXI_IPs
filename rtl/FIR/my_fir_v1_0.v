@@ -68,6 +68,9 @@
 		input wire  m00_axis_tready
 	);
 // Instantiation of Axi Bus Interface S00_AXI
+
+	wire	[C_M00_AXIS_TDATA_WIDTH-1:0]	filter_in , filter_out	;
+
 	my_fir_v1_0_S00_AXI # ( 
 		.C_S_AXI_DATA_WIDTH(C_S00_AXI_DATA_WIDTH),
 		.C_S_AXI_ADDR_WIDTH(C_S00_AXI_ADDR_WIDTH)
@@ -92,8 +95,15 @@
 		.S_AXI_RDATA(s00_axi_rdata),
 		.S_AXI_RRESP(s00_axi_rresp),
 		.S_AXI_RVALID(s00_axi_rvalid),
-		.S_AXI_RREADY(s00_axi_rready)
+		.S_AXI_RREADY(s00_axi_rready),
+
+		//streaming 
+		.S_AXIS_ACLK	(s00_axis_aclk),
+		.S_AXIS_ARESETN	(s00_axis_aresetn),
+		.S_AXIS_TDATA	(filter_in),
+		.M_AXIS_TDATA	(filter_out)
 	);
+
 
 // Instantiation of Axi Bus Interface S00_AXIS
 	my_fir_v1_0_S00_AXIS # ( 
@@ -105,7 +115,8 @@
 		.S_AXIS_TDATA(s00_axis_tdata),
 		.S_AXIS_TSTRB(s00_axis_tstrb),
 		.S_AXIS_TLAST(s00_axis_tlast),
-		.S_AXIS_TVALID(s00_axis_tvalid)
+		.S_AXIS_TVALID(s00_axis_tvalid),
+		.stream_data_out(filter_in)
 	);
 
 // Instantiation of Axi Bus Interface M00_AXIS
@@ -119,7 +130,8 @@
 		.M_AXIS_TDATA(m00_axis_tdata),
 		.M_AXIS_TSTRB(m00_axis_tstrb),
 		.M_AXIS_TLAST(m00_axis_tlast),
-		.M_AXIS_TREADY(m00_axis_tready)
+		.M_AXIS_TREADY(m00_axis_tready),
+		.stream_data_in(filter_out)
 	);
 
 	// Add user logic here
