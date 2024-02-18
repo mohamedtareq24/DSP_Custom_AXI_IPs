@@ -1,10 +1,8 @@
 module sampling_clock_divider (
     input                                       clk                         ,
     input                                       a_rst_n                     ,
-    /// Bus interface
-    input                   [31:0]              i_ckdivider_addrs           , 
-    input                                       i_ckdivider_write           ,
-    //registermap 
+    
+    //registers
     input                   [31:0]              i_ckdivider_clk_div_reg     ,
     input                   [31:0]              i_ckdivider_ctrl_reg        ,
     //sampling signal 
@@ -22,21 +20,26 @@ begin
     if (!a_rst_n)
     begin
         counter <= 0;
+        o_ckdivider_sample_en <= 0;
     end
     else if (i_ckdivider_ctrl_reg[CTRL_RST_BIT])
-        counter <=  0;
-    else if (i_ckdivider_write & i_ckdivider_addrs == CLKDIV)
-    begin
-        counter <= (i_ckdivider_clk_div_reg >> 1) - 1 ;  // divide by even numbers
-    end
+        begin
+            counter <=  0;
+            o_ckdivider_sample_en <= 0;
+        end
     else if (i_ckdivider_ctrl_reg[CTRL_STRT_BIT])
     begin
         counter <=  counter - 1 ;
         if (counter == 0)
             begin
             counter <= (i_ckdivider_clk_div_reg >> 1) - 1 ;
-            o_ckdivider_sample_en <= ~  o_ckdivider_sample_en   ;
+            o_ckdivider_sample_en <= 1   ;
         end
+    end
+    else 
+    begin
+        counter <= (i_ckdivider_clk_div_reg >> 1) - 1 ;  // divide by even numbers
+        o_ckdivider_sample_en <= 0;
     end
 end
 

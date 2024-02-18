@@ -22,7 +22,7 @@ module sin_lut
 
 	initial
 	begin
-		$readmemb("sin_lut_init_file.txt", rom);
+		$readmemb("D:\\Digital_Electronics\\DSP\\DSP_course\\rtl\\dds\\sin_lut_init_file.txt", rom);
 	end
 
 	always @ (posedge clk)

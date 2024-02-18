@@ -35,6 +35,7 @@
 		// Global Reset Signal. This Signal is Active LOW
 		input wire  S_AXI_ARESETN,
 		// Write address (issued by master, acceped by Slave)
+
 		input wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR,
 		// Write channel Protection type. This signal indicates the
     		// privilege and security level of the transaction, and whether
@@ -93,7 +94,7 @@
 	);
 
 	// AXI4LITE signals
-	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr;
+	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr , axi_awaddr_d;
 	reg  	axi_awready;
 	reg  	axi_wready;
 	reg [1 : 0] 	axi_bresp;
@@ -110,14 +111,15 @@
 	// ADDR_LSB = 2 for 32 bits (n downto 2)
 	// ADDR_LSB = 3 for 64 bits (n downto 3)
 	localparam integer ADDR_LSB = (C_S_AXI_DATA_WIDTH/32) + 1;
-	localparam integer OPT_MEM_ADDR_BITS = 2;
+	localparam integer OPT_MEM_ADDR_BITS = 0;
 	//----------------------------------------------
 	//-- Signals for user logic register space example
 	//------------------------------------------------
 	//-- Number of Slave Registers 8
 	reg [C_S_AXI_DATA_WIDTH-1:0] slv_reg [DEPTH-1:0];
-	wire	 slv_reg_rden;
-	wire	 slv_reg_wren;
+	wire	 	slv_reg_rden;
+	wire	 	slv_reg_wren;
+	reg			slv_reg_wren_d , slv_reg_wren_dd;
 	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
 	integer	 byte_index;
 	reg	 aw_en;
@@ -125,13 +127,13 @@
 	// I/O Connections assignments
 
 	assign S_AXI_AWREADY	= axi_awready;
-	assign S_AXI_WREADY	= axi_wready;
-	assign S_AXI_BRESP	= axi_bresp;
-	assign S_AXI_BVALID	= axi_bvalid;
+	assign S_AXI_WREADY		= axi_wready;
+	assign S_AXI_BRESP		= axi_bresp;
+	assign S_AXI_BVALID		= axi_bvalid;
 	assign S_AXI_ARREADY	= axi_arready;
-	assign S_AXI_RDATA	= axi_rdata;
-	assign S_AXI_RRESP	= axi_rresp;
-	assign S_AXI_RVALID	= axi_rvalid;
+	assign S_AXI_RDATA		= axi_rdata;
+	assign S_AXI_RRESP		= axi_rresp;
+	assign S_AXI_RVALID		= axi_rvalid;
 	// Implement axi_awready generation
 	// axi_awready is asserted for one S_AXI_ACLK clock cycle when both
 	// S_AXI_AWVALID and S_AXI_WVALID are asserted. axi_awready is
@@ -139,26 +141,26 @@
 
 	always @( posedge S_AXI_ACLK )
 	begin
-	  if ( S_AXI_ARESETN == 1'b0 )
-	    begin
-	      axi_awready <= 1'b0;
-	      aw_en <= 1'b1;
-	    end 
-	  else
-	    begin    
-	      if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID && aw_en)
+	if ( S_AXI_ARESETN == 1'b0 )
+		begin
+			axi_awready <= 1'b0;
+			aw_en <= 1'b1;
+		end 
+	else
+		begin    
+	    	if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID && aw_en)
 	        begin
 	          // slave is ready to accept write address when 
 	          // there is a valid write address and write data
 	          // on the write address and data bus. This design 
 	          // expects no outstanding transactions. 
-	          axi_awready <= 1'b1;
-	          aw_en <= 1'b0;
+				axi_awready <= 1'b1;
+				aw_en <= 1'b0;
 	        end
 	        else if (S_AXI_BREADY && axi_bvalid)
 	            begin
-	              aw_en <= 1'b1;
-	              axi_awready <= 1'b0;
+					aw_en <= 1'b1;
+					axi_awready <= 1'b0;
 	            end
 	      else           
 	        begin
@@ -194,25 +196,25 @@
 
 	always @( posedge S_AXI_ACLK )
 	begin
-	  if ( S_AXI_ARESETN == 1'b0 )
-	    begin
-	      axi_wready <= 1'b0;
-	    end 
-	  else
-	    begin    
-	      if (~axi_wready && S_AXI_WVALID && S_AXI_AWVALID && aw_en )
-	        begin
-	          // slave is ready to accept write data when 
-	          // there is a valid write address and write data
-	          // on the write address and data bus. This design 
-	          // expects no outstanding transactions. 
-	          axi_wready <= 1'b1;
-	        end
-	      else
-	        begin
-	          axi_wready <= 1'b0;
-	        end
-	    end 
+		if ( S_AXI_ARESETN == 1'b0 )
+		begin
+			axi_wready <= 1'b0;
+		end 
+		else
+		begin    
+			if (~axi_wready && S_AXI_WVALID && S_AXI_AWVALID && aw_en )
+			begin
+				// slave is ready to accept write data when 
+				// there is a valid write address and write data
+				// on the write address and data bus. This design 
+				// expects no outstanding transactions. 
+				axi_wready <= 1'b1;
+			end
+			else
+			begin
+				axi_wready <= 1'b0;
+			end
+		end 
 	end       
 
 	// Implement memory mapped register select and write logic generation
@@ -226,90 +228,56 @@
 
 	always @( posedge S_AXI_ACLK )
 	begin
-	  if ( S_AXI_ARESETN == 1'b0 )
-	    begin
-	      slv_reg[CTRL]    <= 0;
-	      slv_reg[THETAS]  <= 0;
-	      slv_reg[DELTAS]  <= 0;
-	      slv_reg[AMPLS]   <= 0;
-	      slv_reg[STAT]    <= 0;
-	      slv_reg[LNGTH]   <= 0;
-	      slv_reg[CLKDIV]  <= 0;
-	      slv_reg[RSRVD]   <= 0;
-	    end 
-	  else begin
-	    if (slv_reg_wren)
-	      begin
-	        case ( axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
-	          3'h0:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 0
-	                slv_reg[CTRL][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h1:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 1
-	                slv_reg[THETAS][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h2:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 2
-	                slv_reg[DELTAS][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h3:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 3
-	                slv_reg[AMPLS][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h4:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 4
-	                slv_reg[STAT][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h5:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 5
-	                slv_reg[LNGTH][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h6:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 6
-	                slv_reg[CLKDIV][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          3'h7:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 7
-	                slv_reg[RSRVD][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
-	          default : begin
-	                      slv_reg[CTRL] 	<= slv_reg[CTRL];
-	                      slv_reg[THETAS] 	<= slv_reg[THETAS];
-	                      slv_reg[DELTAS] 	<= slv_reg[DELTAS];
-	                      slv_reg[AMPLS] 	<= slv_reg[AMPLS];
-	                      slv_reg[CLKDIV] 	<= slv_reg[CLKDIV];
-	                      slv_reg[STAT] 	<= slv_reg[STAT];
-	                      slv_reg[LNGTH] 	<= slv_reg[LNGTH];
-	                      slv_reg[RSRVD] 	<= slv_reg[RSRVD];
-	                    end
-	        endcase
-	      end
-	  end
+	if ( S_AXI_ARESETN == 1'b0 )
+	begin
+		slv_reg[CTRL]    	<= 0;
+		slv_reg[THETAS]  	<= 0;
+		slv_reg[DELTAS]  	<= 0;
+		slv_reg[AMPLS]   	<= 0;
+		slv_reg[STAT]    	<= 0;
+		slv_reg[LNGTH]   	<= 0;
+		slv_reg[CLKDIV]  	<= 0;
+		slv_reg[RSRVD]   	<= 0;
+		slv_reg_wren_d		<= 0;	
+		axi_awaddr_d		<= 0;
+		slv_reg_wren_dd		<= 0;
+	end 
+	else begin
+		slv_reg_wren_d	<=	slv_reg_wren 	;			/// this will be used to trigger a write
+		slv_reg_wren_dd	<= 	slv_reg_wren_d	;
+		axi_awaddr_d	<=	axi_awaddr		;
+		
+		
+		if (slv_reg_wren)
+		begin
+			case (axi_awaddr)
+				CTRL:
+					slv_reg[CTRL] <= S_AXI_WDATA	; 
+				THETAS:
+					slv_reg[THETAS] <= S_AXI_WDATA	;
+				DELTAS:
+					slv_reg[DELTAS] <= S_AXI_WDATA	;
+				AMPLS:
+					slv_reg[AMPLS] <= S_AXI_WDATA	; 
+				LNGTH:
+					slv_reg[LNGTH] <= S_AXI_WDATA	;
+				CLKDIV:
+					slv_reg[CLKDIV] <= S_AXI_WDATA	;
+				RSRVD:
+					slv_reg[RSRVD] <= S_AXI_WDATA	;
+				default: 
+				begin
+					slv_reg[CTRL] 	<= slv_reg[CTRL]	;
+					slv_reg[THETAS]	<= slv_reg[THETAS]	;
+					slv_reg[DELTAS] <= slv_reg[DELTAS]	;
+					slv_reg[AMPLS] 	<= slv_reg[AMPLS]	;
+					slv_reg[CLKDIV] <= slv_reg[CLKDIV]	;
+					slv_reg[LNGTH] 	<= slv_reg[LNGTH]	;
+					slv_reg[RSRVD] 	<= slv_reg[RSRVD]	;
+				end
+				endcase
+			end
+		end
 	end    
 
 	// Implement write response logic generation
@@ -412,18 +380,17 @@
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
 	always @(*)
 	begin
-	      // Address decoding for reading registers
-	      case ( axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
-	        3'h0   : reg_data_out <= slv_reg[DELTAS];
-	        3'h1   : reg_data_out <= slv_reg[THETAS];
-	        3'h2   : reg_data_out <= slv_reg[DELTAS];
-	        3'h3   : reg_data_out <= slv_reg[AMPLS];
-	        3'h4   : reg_data_out <= slv_reg[CLKDIV];
-	        3'h5   : reg_data_out <= slv_reg[STAT];
-	        3'h6   : reg_data_out <= slv_reg[LNGTH];
-	        3'h7   : reg_data_out <= slv_reg[RSRVD];
-	        default : reg_data_out <= 0;
-	      endcase
+		case ( axi_araddr )
+			3'h0   : reg_data_out <= slv_reg[DELTAS];
+			3'h1   : reg_data_out <= slv_reg[THETAS];
+			3'h2   : reg_data_out <= slv_reg[DELTAS];
+			3'h3   : reg_data_out <= slv_reg[AMPLS];
+			3'h4   : reg_data_out <= slv_reg[CLKDIV];
+			3'h5   : reg_data_out <= slv_reg[STAT];
+			3'h6   : reg_data_out <= slv_reg[LNGTH];
+			3'h7   : reg_data_out <= slv_reg[RSRVD];
+			default : reg_data_out <= 0;
+		endcase
 	end
 
 	// Output register or memory read data
@@ -462,8 +429,8 @@ top #(.SIG_WIDTH (SIG_WIDTH)) dds_top_u (
 		.signal(out_stream),
 		.valid(valid),
 
-        .i_write(~axi_awready & S_AXI_AWVALID & S_AXI_WVALID & aw_en),
-        .i_addrs(axi_awaddr)
+        .i_write( slv_reg_wren_dd ),
+        .i_addrs(axi_awaddr_d)
 );
 
 	// User logic ends

@@ -1,0 +1,231 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/Digital_Electronics/DSP/DSP_course
+vdds
+Z1 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z2 !s110 1708228550
+!i10b 1
+!s100 [MJ>@6zY[R]gQ9KX;GC843
+Z3 !s11b Dg1SIo80bB@j0V0VzS_@n1
+Iz]fOiF[kzCJIHoc]PBX7Y0
+Z4 VDg1SIo80bB@j0V0VzS_@n1
+S1
+R0
+w1708222082
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/dds.sv
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/dds.sv
+!i122 109
+L0 1 295
+Z5 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z6 !s108 1708228550.000000
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/dds.sv|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/dds.sv|
+!i113 1
+Z7 o-work work
+Z8 tCvgOpt 0
+vmy_dds_v1_0
+R2
+!i10b 1
+!s100 2WgBMUe=5>hGLPf<:OC?20
+R3
+IF<J[BM`H7AkYEIQcNB<PM0
+R4
+R0
+w1706393764
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0.v
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0.v
+!i122 108
+L0 4 104
+R5
+r1
+!s85 0
+31
+R6
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0.v|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0.v|
+!i113 1
+R7
+R8
+vmy_dds_v1_0_M00_AXIS
+R2
+!i10b 1
+!s100 SjbkM9bCC65:^kzYgadR12
+R3
+IjMPKja<G2Q49W`cO3n9n51
+R4
+R0
+w1706393210
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_M00_AXIS.v
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_M00_AXIS.v
+!i122 107
+L0 3 95
+R5
+r1
+!s85 0
+31
+R6
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_M00_AXIS.v|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_M00_AXIS.v|
+!i113 1
+R7
+R8
+nmy_dds_v1_0_@m00_@a@x@i@s
+vmy_dds_v1_0_S00_AXI
+R2
+!i10b 1
+!s100 @46ZPCBKK01W=M?2MBQB:3
+R3
+IT5WMHj`8lBiDGHM@m5lW;2
+R4
+R0
+w1708202059
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_S00_AXI.v
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_S00_AXI.v
+!i122 106
+L0 4 435
+R5
+r1
+!s85 0
+31
+R6
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_S00_AXI.v|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/my_dds_v1_0_S00_AXI.v|
+!i113 1
+R7
+R8
+nmy_dds_v1_0_@s00_@a@x@i
+vmy_dds_v1_0_S00_AXI_tb
+R1
+!s110 1708229271
+!i10b 1
+!s100 J>;9@jHG3ZNU=N5m[jkLH3
+R3
+IUPjoL2;]f=Y5P`^6Tccbf2
+R4
+S1
+R0
+w1708229257
+8D:/Digital_Electronics/DSP/DSP_course/dv/DDS/tb_dds.sv
+FD:/Digital_Electronics/DSP/DSP_course/dv/DDS/tb_dds.sv
+!i122 110
+L0 2 183
+R5
+r1
+!s85 0
+31
+!s108 1708229271.000000
+!s107 D:/Digital_Electronics/DSP/DSP_course/dv/DDS/tb_dds.sv|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/dv/DDS/tb_dds.sv|
+!i113 1
+R7
+R8
+nmy_dds_v1_0_@s00_@a@x@i_tb
+vsampling_clock_divider
+R1
+R2
+!i10b 1
+!s100 9f:4zIeZEJ@1eEAek>YRJ1
+R3
+I3cIoNa55Ci1MEEPPfYf^o0
+R4
+S1
+R0
+w1708173893
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/sampling_clock_divider.sv
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/sampling_clock_divider.sv
+!i122 104
+L0 1 44
+R5
+r1
+!s85 0
+31
+R6
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/sampling_clock_divider.sv|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/sampling_clock_divider.sv|
+!i113 1
+R7
+R8
+vshift_reg
+Z9 !s110 1708228549
+!i10b 1
+!s100 ZoW75K72Si_Q`ZW<_o1zm0
+R3
+IcS680XJM<eCZ2@5[D78gQ3
+R4
+R0
+w1708228527
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/shift_reg.v
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/shift_reg.v
+!i122 103
+L0 1 51
+R5
+r1
+!s85 0
+31
+Z10 !s108 1708228549.000000
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/shift_reg.v|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/shift_reg.v|
+!i113 1
+R7
+R8
+vsin_lut
+R1
+R9
+!i10b 1
+!s100 CT5cMnRhfGbehooMd7UYM2
+R3
+I=f=genOZ5^P=e]<oj`mN<0
+R4
+S1
+R0
+w1708197834
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/sin_lut.sv
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/sin_lut.sv
+!i122 102
+L0 4 30
+R5
+r1
+!s85 0
+31
+R10
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/sin_lut.sv|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/sin_lut.sv|
+!i113 1
+R7
+R8
+vtop
+R1
+R9
+!i10b 1
+!s100 mH5HcBG?cN9ABaX`Bi<kF0
+R3
+IgIYJJ?ZgClDOTGiLhTSnR3
+R4
+S1
+R0
+w1708174114
+8D:/Digital_Electronics/DSP/DSP_course/rtl/dds/top.sv
+FD:/Digital_Electronics/DSP/DSP_course/rtl/dds/top.sv
+!i122 101
+L0 1 52
+R5
+r1
+!s85 0
+31
+R10
+!s107 D:/Digital_Electronics/DSP/DSP_course/rtl/dds/top.sv|
+!s90 -reportprogress|300|-work|work|D:/Digital_Electronics/DSP/DSP_course/rtl/dds/top.sv|
+!i113 1
+R7
+R8

@@ -2,3 +2,4 @@ fpga/
 *.bak
 .vscode/settings.json
 chat.rapidgpt
+rtl/FIR/reg_file copy.sv

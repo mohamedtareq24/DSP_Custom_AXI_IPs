@@ -1,4 +1,4 @@
-module shift_reg (
+module shift_reg #(parameter   SIG_WIDTH       =   16  )(
     input                                   clk         ,
     input                                   rst         ,   //clear signal 
     input                                   en          ,
@@ -15,7 +15,7 @@ module shift_reg (
     output      [SIG_WIDTH-1:0]             sr_out
 );
 
-parameter   SIG_WIDTH       =   16  ;
+
 parameter   DEPTH           =   515 ;
 
 reg [SIG_WIDTH-1:0] sr [DEPTH-1:0]  ;

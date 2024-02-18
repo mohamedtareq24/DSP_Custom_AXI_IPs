@@ -1,4 +1,4 @@
-module dds ( 
+module dds #(parameter SIG_WIDTH = 16)( 
     input                                       clk                 ,
     input                                       a_rst_n             ,
     // bus intreface
@@ -16,21 +16,24 @@ module dds (
     output  logic signed    [SIG_WIDTH-1:0]     o_dds_signal       
 );
 
-parameter 	SIG_WIDTH		=	16;
-
-parameter   THETAS          =    0;
-parameter   DELTAS          =    1;
-parameter   AMPLS           =    2;
+localparam CTRL =   0;
+localparam THETAS = 1;
+localparam DELTAS = 2;
+localparam AMPLS =  3;
+localparam CLKDIV = 4;
+localparam STAT =   5;
+localparam LNGTH =  6;
+localparam RSRVD =  7;
 
 parameter   CTRL_RST_BIT     =    0;
 parameter   CTRL_STRT_BIT    =    1;
 
-logic                                   thetas_en ,     deltas_en   ,   ampls_en        ;
+logic                                   thetas_en ,     deltas_en   ,   ampls_en        ,   dds_sample_en_dly ;
 logic   signed      [SIG_WIDTH-1:0]     thetas_in ,     deltas_in   ,   ampls_in        ; 
 logic   signed      [SIG_WIDTH-1:0]     thetas_out,     deltas_out  ,   ampls_out       ;
-logic   signed      [SIG_WIDTH-1:0]     theta_reg ,     deltas_reg  ,   ampls_reg   ,   ampls_reg_dly   ;
+logic   signed      [SIG_WIDTH-1:0]     theta_reg ,     deltas_reg  ,   ampls_reg       ,   ampls_reg_dly   ;
 logic   signed      [SIG_WIDTH-1:0]     sin_index ,     sin_out     ,   sin_index_temp  ;
-logic   signed      [SIG_WIDTH-1:0]     mult_out  ,     accmltor    ;
+logic   signed      [SIG_WIDTH-1:0]     mult_out  ,     accmltor    ,   index_accmltor  ;
 
 logic                   dds_rst       ;           // soft reset, reset before writing any data 
 logic                   dds_start     ;
@@ -69,11 +72,16 @@ logic   [SIG_WIDTH-1:0] ampls_tap512        ;
 assign  dds_rst         =   i_dds_ctrl_reg [CTRL_RST_BIT]  ;
 assign  dds_start       =   i_dds_ctrl_reg [CTRL_STRT_BIT] ;
 
+
+///// we need a counter to insure shift reg is circultaed once and the accumaltor hults if count == 0.
+/// this counter will reload with every out sample 
+// the counter wil stop the accumlator from accumlating after all samples are circulated 
+
 //// tap mux 
 always @ (*) 
 begin
     case (i_dds_lngth_reg)
-        1 : begin 
+        1 : begin       /// bug here 
             deltas_feedback_tap     =   deltas_tap1 ;
             ampls_feedback_tap      =   ampls_tap1  ;
             thetas_feedback_tap     =   thetas_tap1 ;
@@ -116,7 +124,7 @@ begin
     endcase
 end
 
-always_comb 
+always@(*) 
 begin 
     thetas_en   =   0;
     thetas_in   =   0;
@@ -138,7 +146,7 @@ begin
     begin
         if (i_dds_write)
         begin
-            case (i_dds_addrs)
+            case (i_dds_addrs[3:0])
                 THETAS  :  
                 begin
                     thetas_en   =   1;
@@ -153,7 +161,7 @@ begin
                 begin
                     ampls_en   =   1;
                     ampls_in   =   i_dds_ampls_reg;
-                end  
+                end
             endcase
         end
     end
@@ -220,8 +228,8 @@ assign  sin_index       = sin_index_temp[SIG_WIDTH-1:SIG_WIDTH-8] ;
 
 sin_lut  lut                
 (
-	.clk    (clk)           ,
-    .addr   (sin_index)     , 
+	.clk    (clk)                ,
+    .addr   (index_accmltor)     , 
 	.q      (sin_out)
 );
 
@@ -244,24 +252,49 @@ assign  mult_out = $signed(ampls_reg_dly) * $signed(sin_out) ;
 
 // accumulator  to superimpose the signals 
 always_ff @(posedge clk or negedge a_rst_n)
+if (!a_rst_n)
+    dds_sample_en_dly <= 0;
+else if (dds_rst)
+    dds_sample_en_dly <= 0;
+else
+    dds_sample_en_dly <= i_dds_sample_en;
+
+always_ff @(posedge clk or negedge a_rst_n)
 begin
     if (!a_rst_n)
     begin
         accmltor        <=  0;
-        o_dds_signal    <=  0;
+        index_accmltor  <=  0;
     end
     else if (dds_rst)
     begin
         accmltor        <=  0;
         o_dds_signal    <=  0;
+        index_accmltor  <=  0;        
     end
     else if (i_dds_sample_en)     // After sampling reset the accumaltor and register it in o_dds_signal 
     begin
-        accmltor        <=  0;
-        o_dds_signal    <=  accmltor     ; 
+        accmltor        <=  0;  // drop old sample and output it  
     end
-        
     else
-        accmltor <= accmltor + mult_out ;   //accumlate 
+    begin
+        accmltor        <= accmltor + mult_out ;   //accumlate 
+        index_accmltor  <= index_accmltor + sin_index;
+    end
 end
+
+always_ff @(posedge i_dds_sample_en or negedge a_rst_n)
+begin
+    if (!a_rst_n)
+    begin
+        o_dds_signal    <=  0;
+    end
+    else if (dds_rst)
+    begin
+        o_dds_signal    <=  0;    
+    end
+    else
+        o_dds_signal    <=  accmltor    ;
+end
+
 endmodule

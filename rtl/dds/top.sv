@@ -1,4 +1,4 @@
-module top (
+module top #(parameter SIG_WIDTH  =  16 )(
     input                   clk             ,
     input                   a_rst_n         ,
     
@@ -17,11 +17,9 @@ module top (
     input [31:0]            i_addrs
 );
 
-    parameter SIG_WIDTH  = 	16 ;
 
-    logic [SIG_WIDTH-1:0] signal;
+
     logic        sample_en      ;
-
     assign  valid = sample_en    ;
 
     // Instantiate the dds module
@@ -46,10 +44,7 @@ module top (
         .clk(clk),
         .a_rst_n(a_rst_n),
         
-        .i_ckdivider_addrs(i_addrs),
-        .i_ckdivider_write(i_write),
-        
-        .i_ckdivider_clk_div_reg   (clkdiv_reg),
+        .i_ckdivider_clk_div_reg  (clkdiv_reg),
         .i_ckdivider_ctrl_reg     (ctrl_reg),
         .o_ckdivider_sample_en    (sample_en)
     );
