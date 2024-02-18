@@ -32,13 +32,15 @@ begin
         counter <=  counter - 1 ;
         if (counter == 0)
             begin
-            counter <= (i_ckdivider_clk_div_reg >> 1) - 1 ;
+            counter <= (i_ckdivider_clk_div_reg ) - 1 ;
             o_ckdivider_sample_en <= 1   ;
         end
+        else
+            o_ckdivider_sample_en <= 0   ;
     end
     else 
     begin
-        counter <= (i_ckdivider_clk_div_reg >> 1) - 1 ;  // divide by even numbers
+        counter <= (i_ckdivider_clk_div_reg ) - 1 ;  // divide by even numbers
         o_ckdivider_sample_en <= 0;
     end
 end

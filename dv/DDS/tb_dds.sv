@@ -86,8 +86,32 @@ module my_dds_v1_0_S00_AXI_tb;
     integer i;
     int tb_data;
     int tb_addr;
+    int gap_clks;
 
     always #((CLKPER) / 2) s_axi_aclk = ~s_axi_aclk;
+    always  gap_clks    = $urandom_range(1,10);      /// randomizing some delay for the AXI transactions
+    property check_ampls_reg;
+    logic [31:0] ampls_reg_scaled;
+    logic [31:0] out_stream_scaled;
+
+    // Scaling the ampls_reg value
+    assign ampls_reg_scaled = ampls_reg * 256;
+
+    // Scaling the out_stream value
+    assign out_stream_scaled = out_stream;
+
+    // Assertion to check if out_stream doesn't exceed ampls_reg * 256
+    @(posedge clk) disable iff (!rst_n) // Assuming clk and rst_n are your clock and reset signals
+    (
+        // Assertion condition
+        (out_stream_scaled <= ampls_reg_scaled) |
+        // If the assertion fails, print a message with the failing values
+        $error("Assertion failed: out_stream (%0d) exceeds ampls_reg * 256 (%0d)", out_stream_scaled, ampls_reg_scaled)
+    );
+endproperty
+
+// Assuming you want this check to be continuously monitored
+assert property (check_ampls_reg);
 
     initial 
     begin 
@@ -99,10 +123,13 @@ module my_dds_v1_0_S00_AXI_tb;
         #10;
         s_axi_aresetn = 1;
         #10;
+        ///////////////////////////////// TESTING THE AXI LITE SLAVE
         $display("TESTING WRITING");
         for (i = 0; i < 100; i++) 
         begin 
-            tb_addr = $urandom_range(0, 6); // Generate random address between 0 and 6
+            tb_addr     = $urandom_range(0, 6); // Generate random address between 0 and 6
+            if (tb_addr == 5 )
+                tb_addr = 6 ;
             tb_data = $urandom; // Generate random data
             // Write data to address
             axi_write(tb_addr, tb_data);
@@ -110,27 +137,27 @@ module my_dds_v1_0_S00_AXI_tb;
             #CLKPER;
             $display("Write:Address = %d, Data = %h, Read Data = %h, Write Successful = %b",
             tb_addr, tb_data, dut.slv_reg[tb_addr], (dut.slv_reg[tb_addr] == tb_data));
-            #(CLKPER*4); 
+            #(CLKPER*gap_clks); 
         end
-
+///////////////////////////////// DDS SINGLE SINUS
         $display("STARTING DDS");
         axi_write(CTRL, 2'b1); // soft reset 
-        # (CLKPER * 4);
+        # (CLKPER * gap_clks);
         axi_write(CTRL, 2'b0); // soft reset 
-        # (CLKPER * 4);
-        axi_write(LNGTH, 8);  // single sinus 
-        # (CLKPER * 2);
-        axi_write(CLKDIV, 30); // you have 4 cycles / sample 
-        # (CLKPER * 4);
+        # (CLKPER * gap_clks);
+        axi_write(LNGTH, 2);  // single sinus 
+        # (CLKPER * gap_clks);
+        axi_write(CLKDIV, 18); // you have 4 cycles / sample 
+        # (CLKPER * gap_clks);
         axi_write(THETAS, 0); // Phase = 0 
-        # (CLKPER * 8);
+        # (CLKPER * gap_clks);
         axi_write(DELTAS, 16'h0100); // 8 samples in a cycle  
-        # (CLKPER * 3);
+        # (CLKPER * gap_clks);
         axi_write(AMPLS, 16'h4); // Ampl of 1   
-        # (CLKPER * 2);    
+        # (CLKPER * gap_clks);    
         axi_write(CTRL, 2'b10);
         #  2000 ;
-
+        /// single sinus
         // for (i = 0; i < 64; i = i + 1) begin
         //     // Generate random data
         //     data_to_write = $random;

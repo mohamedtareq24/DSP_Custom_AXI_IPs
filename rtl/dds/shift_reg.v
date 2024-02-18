@@ -41,7 +41,7 @@ begin
 
 end
 assign  sr_out  =   sr[DEPTH-1] ;
-assign  sr_1    =   sr[0]       ;
+assign  sr_1    =   sr[1]       ;
 assign  sr_8    =   sr[7]       ;
 assign  sr_16   =   sr[15]      ;
 assign  sr_32   =   sr[31]      ;

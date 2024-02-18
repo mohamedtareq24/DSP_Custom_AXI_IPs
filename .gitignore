@@ -3,3 +3,7 @@ fpga/
 .vscode/settings.json
 chat.rapidgpt
 rtl/FIR/reg_file copy.sv
+work/
+transcript
+vsim.wlf
+transcript

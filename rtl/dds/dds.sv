@@ -69,19 +69,20 @@ logic   [SIG_WIDTH-1:0] ampls_tap128        ;
 logic   [SIG_WIDTH-1:0] ampls_tap256        ;
 logic   [SIG_WIDTH-1:0] ampls_tap512        ;
 
+logic   [31:0]          length_counter      ;
+logic                   circ_en             ;
+
 assign  dds_rst         =   i_dds_ctrl_reg [CTRL_RST_BIT]  ;
 assign  dds_start       =   i_dds_ctrl_reg [CTRL_STRT_BIT] ;
 
 
-///// we need a counter to insure shift reg is circultaed once and the accumaltor hults if count == 0.
-/// this counter will reload with every out sample 
-// the counter wil stop the accumlator from accumlating after all samples are circulated 
+
 
 //// tap mux 
 always @ (*) 
 begin
     case (i_dds_lngth_reg)
-        1 : begin       /// bug here 
+        2 : begin       /// bug here 
             deltas_feedback_tap     =   deltas_tap1 ;
             ampls_feedback_tap      =   ampls_tap1  ;
             thetas_feedback_tap     =   thetas_tap1 ;
@@ -123,6 +124,28 @@ begin
         end 
     endcase
 end
+///// we need a counter to insure shift reg is circultaed once and the accumaltor hults if count == 0.
+/// this counter will reload with every out sample 
+// the counter wil stop the accumlator from accumlating after all samples are circulated 
+
+always_ff @(posedge clk or negedge a_rst_n)
+    if (!a_rst_n)
+        length_counter  <= 0;
+    else if (dds_rst)
+        length_counter <= 0;
+    else if (dds_start) 
+    begin
+        if (dds_sample_en_dly)     // loading the counter whenever a samople is out 
+            length_counter <= i_dds_lngth_reg;
+        else if (length_counter != 0)
+            length_counter <= length_counter - 1;
+    end
+
+assign  circ_en  =  (length_counter != 0) ;    
+// if the length counter zeros this means all inputs have made a cycle in the fifo 
+//circ_en will be anded with the enable of the fifo 
+//circ_en will be anded with the accumaltor to ensure accumlator doesn't get any value after all inputs are circultaed
+// this should ensure that the fifos doeson't recirculate the data again 
 
 always@(*) 
 begin 
@@ -135,9 +158,9 @@ begin
     
     if (dds_start)                      /// buffer circulats the data 
     begin                               /// taps to be added here
-        thetas_en   =   1;
-        deltas_en   =   1;
-        ampls_en    =   1;
+        thetas_en   =   circ_en;
+        deltas_en   =   circ_en;
+        ampls_en    =   circ_en;
         thetas_in   =   thetas_feedback_tap         ;
         deltas_in   =   deltas_feedback_tap         ;
         ampls_in    =   ampls_feedback_tap          ;
@@ -166,6 +189,7 @@ begin
         end
     end
 end
+
 
 
 shift_reg thetas_fifo (
@@ -248,16 +272,15 @@ shift_reg ampls_fifo (
     .sr_out (ampls_tap512)
 );
 
-assign  mult_out = $signed(ampls_reg_dly) * $signed(sin_out) ;
+assign  mult_out = $signed(ampls_reg) * $signed(sin_out) ;
 
-// accumulator  to superimpose the signals 
 always_ff @(posedge clk or negedge a_rst_n)
-if (!a_rst_n)
-    dds_sample_en_dly <= 0;
-else if (dds_rst)
-    dds_sample_en_dly <= 0;
-else
-    dds_sample_en_dly <= i_dds_sample_en;
+    if (!a_rst_n)
+        dds_sample_en_dly <= 0;
+    else if (dds_rst)
+        dds_sample_en_dly <= 0;
+    else
+        dds_sample_en_dly <= i_dds_sample_en;
 
 always_ff @(posedge clk or negedge a_rst_n)
 begin
@@ -269,32 +292,19 @@ begin
     else if (dds_rst)
     begin
         accmltor        <=  0;
-        o_dds_signal    <=  0;
         index_accmltor  <=  0;        
     end
-    else if (i_dds_sample_en)     // After sampling reset the accumaltor and register it in o_dds_signal 
+    else if (dds_sample_en_dly)     // After sampling reset the accumaltor and register it in o_dds_signal 
     begin
-        accmltor        <=  0;  // drop old sample and output it  
+        accmltor        <=  0;  // drop old sample and output it
+        o_dds_signal    <=  accmltor    ;  
     end
     else
-    begin
+    begin 
         accmltor        <= accmltor + mult_out ;   //accumlate 
         index_accmltor  <= index_accmltor + sin_index;
     end
 end
 
-always_ff @(posedge i_dds_sample_en or negedge a_rst_n)
-begin
-    if (!a_rst_n)
-    begin
-        o_dds_signal    <=  0;
-    end
-    else if (dds_rst)
-    begin
-        o_dds_signal    <=  0;    
-    end
-    else
-        o_dds_signal    <=  accmltor    ;
-end
 
 endmodule
