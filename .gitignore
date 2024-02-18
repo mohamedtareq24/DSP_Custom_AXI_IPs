@@ -5,5 +5,5 @@ chat.rapidgpt
 rtl/FIR/reg_file copy.sv
 work/
 transcript
-vsim.wlf
+*.wlf
 transcript
