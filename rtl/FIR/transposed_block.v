@@ -1,4 +1,4 @@
-module transposed_block(clk , resetn ,normal_signal ,coeff,to_register, summed_signal);
+module transposed_block(clk , reset_n ,normal_signal ,coeff,to_register, summed_signal);
 
 	parameter N = 16;								// bit resolution
 

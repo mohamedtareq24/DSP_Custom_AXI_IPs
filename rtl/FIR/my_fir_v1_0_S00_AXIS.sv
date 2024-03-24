@@ -13,7 +13,8 @@
 	)
 	(
 		// Users to add ports here
-		output wire [C_S_AXIS_TDATA_WIDTH-1 : 0] stream_data_out,
+		output 	reg [C_S_AXIS_TDATA_WIDTH-1 : 0] stream_data_out,
+		input 	wire 	en	,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -33,7 +34,7 @@
 		input wire  S_AXIS_TVALID
 	);
 
-	assign S_AXIS_TREADY	= 1'b1;
+	assign S_AXIS_TREADY	= en	;
 	
 
 

@@ -3,8 +3,9 @@
 module my_fir_v1_0_S00_AXI #
 	(
 		// Users to add parameters here
-        parameter           DEPTH               	= 128,
+        parameter           DEPTH               	= 	128,
 		parameter			C_M00_AXIS_TDATA_WIDTH	=	32,
+		parameter			FILTER_DATA_WIDTH		=	16,
 		// User parameters ends
 		// Do not modify the parameters beyond this line
 		// Width of S_AXI data bus
@@ -18,6 +19,7 @@ module my_fir_v1_0_S00_AXI #
 		input 	wire 	S_AXIS_ARESETN,
 		input 	wire 	[C_M00_AXIS_TDATA_WIDTH-1:0]	S_AXIS_TDATA,			// filter Slave axistream 	input
 		output 	wire	[C_M00_AXIS_TDATA_WIDTH-1:0]	M_AXIS_TDATA,			// filter Master axistream  output 
+		output	wire									en			,			// AXI stream ready 
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -100,13 +102,17 @@ module my_fir_v1_0_S00_AXI #
 	// ADDR_LSB is used for addressing 32/64 bit registers/memories
 	// ADDR_LSB = 2 for 32 bits (n downto 2)
 	// ADDR_LSB = 3 for 64 bits (n downto 3)
+	localparam	CTRL 		=	0	;
+	localparam	EN_bit		=	0	;
+
 	localparam integer ADDR_LSB = (C_S_AXI_DATA_WIDTH/32) + 1;
 	localparam integer OPT_MEM_ADDR_BITS = 6;
 	//----------------------------------------------
 	//-- Signals for user logic register space example
 	//------------------------------------------------
 	//-- Number of Slave Registers 128
-	reg [C_S_AXI_DATA_WIDTH-1:0]	coef_slv_reg [0:DEPTH-1];
+	reg [C_S_AXI_DATA_WIDTH-1:0]	ctrl_reg ;
+	reg [C_S_AXI_DATA_WIDTH-1:0]	coef_slv_reg [1:DEPTH-1];
 	wire	 slv_reg_rden;
 	wire	 slv_reg_wren;
 	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
@@ -221,24 +227,31 @@ module my_fir_v1_0_S00_AXI #
 	begin
 	if ( S_AXI_ARESETN == 1'b0 )
         begin
+			ctrl_reg 	<=	0	; 
+
             for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1)
                 coef_slv_reg[reg_index] <= 0;
         end 
     else if (slv_reg_wren) 
         begin
-            for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1) begin
-                if (axi_awaddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == reg_index) begin
-                    for (byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8) - 1; byte_index = byte_index + 1) 
-                    begin
-                        if (S_AXI_WSTRB[byte_index] == 1) 
-                        begin
-                            // Respective byte enables are asserted as per write strobes 
-                            // Slave register reg_index
-                            coef_slv_reg[reg_index][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-                        end
-                    end
-                end
-            end
+			if (axi_awaddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == CTRL)
+				ctrl_reg	<= S_AXI_WDATA	;
+			else
+			begin	
+            	for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1) begin
+            	    if (axi_awaddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == reg_index) begin
+            	        for (byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8) - 1; byte_index = byte_index + 1) 
+            	        begin
+            	            if (S_AXI_WSTRB[byte_index] == 1) 
+            	            begin
+            	                // Respective byte enables are asserted as per write strobes 
+            	                // Slave register reg_index
+            	                coef_slv_reg[reg_index][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
+            	            end
+            	        end
+            	    end
+            	end
+			end
         end
     end
     
@@ -343,6 +356,10 @@ module my_fir_v1_0_S00_AXI #
 
 	always @(*)
     begin
+		if (axi_araddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == CTRL) 
+		begin
+			reg_data_out <= ctrl_reg;
+		end		
         for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1) 
         begin
             if (axi_araddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == reg_index) 
@@ -372,13 +389,18 @@ module my_fir_v1_0_S00_AXI #
 	end    
 
 	// Add user logic here
-FIR_transposed #()
+
+assign 	en	=	ctrl_reg[EN_bit] ;
+
+FIR_transposed #(	.TAPS(DEPTH),
+					.DATA_WIDTH(FILTER_DATA_WIDTH)
+)
 u_filter 
 (	.clk(S_AXIS_ACLK) , 
 	.reset_n(S_AXIS_ARESETN) , 
-	.noisy_signal(S_AXIS_TDATA) , 
-	.filtered_signal(M_AXIS_TDATA),
-	.coeff(coef_slv_reg)
+	.noisy_signal	(S_AXIS_TDATA[FILTER_DATA_WIDTH-1:0]) , 
+	.filtered_signal(M_AXIS_TDATA[FILTER_DATA_WIDTH-1:0]),
+	.coeff			(coef_slv_reg[FILTER_DATA_WIDTH-1:0])
 );
 
 	// User logic ends

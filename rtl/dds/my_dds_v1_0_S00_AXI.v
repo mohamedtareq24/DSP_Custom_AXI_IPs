@@ -381,7 +381,7 @@
 	always @(*)
 	begin
 		case ( axi_araddr )
-			3'h0   : reg_data_out <= slv_reg[DELTAS];
+			3'h0   : reg_data_out <= slv_reg[CTRL];
 			3'h1   : reg_data_out <= slv_reg[THETAS];
 			3'h2   : reg_data_out <= slv_reg[DELTAS];
 			3'h3   : reg_data_out <= slv_reg[AMPLS];

@@ -3,13 +3,13 @@
 module FIR_transposed(clk , reset_n , noisy_signal , filtered_signal,coeff);
 
 	parameter DATA_WIDTH = 16;																										// bit resolution
-	parameter TAPS = 128;																									            // number of Taps
+	parameter TAPS = 128;																									        // number of Taps
 
 	input 					        									   clk ;
 	input 					        								       reset_n;				  									//async active low reset
 	input 	signed 			[DATA_WIDTH-1   :0] 		  			       noisy_signal;         						//input signal that to be filtered
 	output 	signed 			[2*DATA_WIDTH-1 :0] 					        filtered_signal; 	  							//output signal of the fir 
-    input   signed          [DATA_WIDTH-1   :0] 				            coeff 	[0:TAPS-1];                  // filter coefs from register file
+  input   signed      [DATA_WIDTH-1   :0] 				          coeff 	[0:TAPS-1];                  // filter coefs from register file
 	
 
 	wire 		signed 			[2*DATA_WIDTH-1:0] 						summed_signal 		[0:TAPS-1];

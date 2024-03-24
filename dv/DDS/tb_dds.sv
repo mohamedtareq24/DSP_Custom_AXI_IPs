@@ -89,29 +89,7 @@ module my_dds_v1_0_S00_AXI_tb;
     int gap_clks;
 
     always #((CLKPER) / 2) s_axi_aclk = ~s_axi_aclk;
-    always  gap_clks    = $urandom_range(1,10);      /// randomizing some delay for the AXI transactions
-    property check_ampls_reg;
-    logic [31:0] ampls_reg_scaled;
-    logic [31:0] out_stream_scaled;
-
-    // Scaling the ampls_reg value
-    assign ampls_reg_scaled = ampls_reg * 256;
-
-    // Scaling the out_stream value
-    assign out_stream_scaled = out_stream;
-
-    // Assertion to check if out_stream doesn't exceed ampls_reg * 256
-    @(posedge clk) disable iff (!rst_n) // Assuming clk and rst_n are your clock and reset signals
-    (
-        // Assertion condition
-        (out_stream_scaled <= ampls_reg_scaled) |
-        // If the assertion fails, print a message with the failing values
-        $error("Assertion failed: out_stream (%0d) exceeds ampls_reg * 256 (%0d)", out_stream_scaled, ampls_reg_scaled)
-    );
-endproperty
-
-// Assuming you want this check to be continuously monitored
-assert property (check_ampls_reg);
+    always #((CLKPER) / 2) gap_clks    = $urandom_range(1,10);      /// randomizing some delay for the AXI transactions
 
     initial 
     begin 
@@ -156,7 +134,11 @@ assert property (check_ampls_reg);
         axi_write(AMPLS, 16'h4); // Ampl of 1   
         # (CLKPER * gap_clks);    
         axi_write(CTRL, 2'b10);
-        #  2000 ;
+
+        $dumpfile("signal.vcd");
+            $dumpvars(1,dut.dds_top_u.u_dds.o_dds_signal);
+        #  20000 ;
+            $dumpoff;
         /// single sinus
         // for (i = 0; i < 64; i = i + 1) begin
         //     // Generate random data
