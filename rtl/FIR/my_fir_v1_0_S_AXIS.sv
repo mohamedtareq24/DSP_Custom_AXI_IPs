@@ -1,7 +1,7 @@
 
 `timescale 1 ns / 1 ps
 
-	module my_fir_v1_0_S00_AXIS #
+	module my_fir_v1_0_S_AXIS #
 	(
 		// Users to add parameters here
 

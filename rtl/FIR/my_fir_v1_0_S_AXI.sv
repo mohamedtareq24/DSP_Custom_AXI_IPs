@@ -1,10 +1,10 @@
-`timescale 1 ns / 100 ps
+`timescale 1 ns / 1 ps
 
-module my_fir_v1_0_S00_AXI #
+module my_fir_v1_0_S_AXI #
 	(
 		// Users to add parameters here
-        parameter           DEPTH               	= 	128,
-		parameter			C_M00_AXIS_TDATA_WIDTH	=	32,
+        parameter           TAPS               		= 	53,
+		parameter			C_M_AXIS_TDATA_WIDTH	=	32,
 		parameter			FILTER_DATA_WIDTH		=	16,
 		// User parameters ends
 		// Do not modify the parameters beyond this line
@@ -17,9 +17,9 @@ module my_fir_v1_0_S00_AXI #
 		// Users to add ports here
 		input	wire 	S_AXIS_ACLK,		// for clocking the filter
 		input 	wire 	S_AXIS_ARESETN,
-		input 	wire 	[C_M00_AXIS_TDATA_WIDTH-1:0]	S_AXIS_TDATA,			// filter Slave axistream 	input
-		output 	wire	[C_M00_AXIS_TDATA_WIDTH-1:0]	M_AXIS_TDATA,			// filter Master axistream  output 
-		output	wire									en			,			// AXI stream ready 
+		input 	wire 	[C_M_AXIS_TDATA_WIDTH-1:0]	S_AXIS_TDATA,			// filter Slave axistream 	input
+		output 	wire	[C_M_AXIS_TDATA_WIDTH-1:0]	M_AXIS_TDATA,			// filter Master axistream  output 
+		output	wire								en			,			// AXI stream ready 
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -112,7 +112,7 @@ module my_fir_v1_0_S00_AXI #
 	//------------------------------------------------
 	//-- Number of Slave Registers 128
 	reg [C_S_AXI_DATA_WIDTH-1:0]	ctrl_reg ;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	coef_slv_reg [1:DEPTH-1];
+	reg [FILTER_DATA_WIDTH-1:0]		coef_slv_reg [1:TAPS];
 	wire	 slv_reg_rden;
 	wire	 slv_reg_wren;
 	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
@@ -122,13 +122,13 @@ module my_fir_v1_0_S00_AXI #
 
 	// I/O Connections assignments
 	assign S_AXI_AWREADY	= axi_awready;
-	assign S_AXI_WREADY	= axi_wready;
-	assign S_AXI_BRESP	= axi_bresp;
-	assign S_AXI_BVALID	= axi_bvalid;
+	assign S_AXI_WREADY		= axi_wready;
+	assign S_AXI_BRESP		= axi_bresp;
+	assign S_AXI_BVALID		= axi_bvalid;
 	assign S_AXI_ARREADY	= axi_arready;
-	assign S_AXI_RDATA	= axi_rdata;
-	assign S_AXI_RRESP	= axi_rresp;
-	assign S_AXI_RVALID	= axi_rvalid;
+	assign S_AXI_RDATA		= axi_rdata;
+	assign S_AXI_RRESP		= axi_rresp;
+	assign S_AXI_RVALID		= axi_rvalid;
 
 	// Implement axi_awready generation
 	// axi_awready is asserted for one S_AXI_ACLK clock cycle when both
@@ -228,32 +228,27 @@ module my_fir_v1_0_S00_AXI #
 	if ( S_AXI_ARESETN == 1'b0 )
         begin
 			ctrl_reg 	<=	0	; 
-
-            for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1)
-                coef_slv_reg[reg_index] <= 0;
+            for (reg_index = 0; reg_index <= TAPS; reg_index = reg_index + 1)
+                coef_slv_reg[reg_index] <= 1;
         end 
     else if (slv_reg_wren) 
         begin
-			if (axi_awaddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == CTRL)
+			if (axi_awaddr == CTRL)
 				ctrl_reg	<= S_AXI_WDATA	;
 			else
 			begin	
-            	for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1) begin
-            	    if (axi_awaddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == reg_index) begin
-            	        for (byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8) - 1; byte_index = byte_index + 1) 
+            	for (reg_index = 1; reg_index <= TAPS; reg_index = reg_index + 1) 
+				begin
+            	    if (axi_awaddr == reg_index) 
+					begin 
             	        begin
-            	            if (S_AXI_WSTRB[byte_index] == 1) 
-            	            begin
-            	                // Respective byte enables are asserted as per write strobes 
-            	                // Slave register reg_index
-            	                coef_slv_reg[reg_index][(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-            	            end
+            	            coef_slv_reg[reg_index] <= S_AXI_WDATA[FILTER_DATA_WIDTH-1:0] ;
             	        end
             	    end
             	end
 			end
-        end
-    end
+		end
+	end
     
 	// Implement write response logic generation
 	// The write response and response valid signals are asserted by the slave 
@@ -356,15 +351,15 @@ module my_fir_v1_0_S00_AXI #
 
 	always @(*)
     begin
-		if (axi_araddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == CTRL) 
+		if (axi_araddr == CTRL) 
 		begin
-			reg_data_out <= ctrl_reg;
+			reg_data_out = ctrl_reg;
 		end		
-        for (reg_index = 0; reg_index < DEPTH; reg_index = reg_index + 1) 
+        for (reg_index = 1; reg_index <= TAPS; reg_index = reg_index + 1) 
         begin
-            if (axi_araddr[ADDR_LSB + OPT_MEM_ADDR_BITS:ADDR_LSB] == reg_index) 
+            if (axi_araddr == reg_index) 
             begin
-                reg_data_out <= coef_slv_reg[reg_index];
+                reg_data_out = coef_slv_reg[reg_index][FILTER_DATA_WIDTH-1:0];
             end
         end
     end
@@ -392,15 +387,15 @@ module my_fir_v1_0_S00_AXI #
 
 assign 	en	=	ctrl_reg[EN_bit] ;
 
-FIR_transposed #(	.TAPS(DEPTH),
+FIR_transposed #(	.TAPS(TAPS),
 					.DATA_WIDTH(FILTER_DATA_WIDTH)
 )
 u_filter 
-(	.clk(S_AXIS_ACLK) , 
-	.reset_n(S_AXIS_ARESETN) , 
-	.noisy_signal	(S_AXIS_TDATA[FILTER_DATA_WIDTH-1:0]) , 
-	.filtered_signal(M_AXIS_TDATA[FILTER_DATA_WIDTH-1:0]),
-	.coeff			(coef_slv_reg[FILTER_DATA_WIDTH-1:0])
+(	.clk			(S_AXIS_ACLK) 							, 
+	.resetn		(S_AXIS_ARESETN) 							, 
+	.noisy_signal	(S_AXIS_TDATA[FILTER_DATA_WIDTH-1:0]) 	, 
+	.filtered_signal(M_AXIS_TDATA[FILTER_DATA_WIDTH*2-1:0])	,
+	.coeff			(coef_slv_reg [1:TAPS])
 );
 
 	// User logic ends

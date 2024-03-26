@@ -21,7 +21,7 @@ t = 0:1/sampling_rate:(num_points-1)*1/sampling_rate;
 
 % Generate signals
 signal = .4*(sin(2*pi*1000*t));
-noise = 0.0*sin(2*pi*2000*t) + 0.1*sin(2*pi*20000*t);
+noise = 0.2*sin(2*pi*100*t) + 0.1*sin(2*pi*200*t);
 noisy_signal = noise + signal;
 
 filtered_noisy_signal = filter(fir_coefficients, 1, noisy_signal);
