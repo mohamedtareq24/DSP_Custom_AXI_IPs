@@ -3,22 +3,21 @@
 	module my_fir_v1_0 #
 	(
 		// Users to add parameters here
-		parameter           TAPS	               	= 	53,
-		parameter			FILTER_DATA_WIDTH		=	16,
+		parameter           TAPS	               	= 	53, 	//! FIlter Order+1
+		parameter			FILTER_DATA_WIDTH		=	16,		//! Fixed point data width of the filter 
 		// User parameters ends
 		
 		// Do not modify the parameters beyond this line
 
 		// Parameters of Axi Slave Bus Interface S_AXI
-		parameter integer C_S_AXI_DATA_WIDTH		= 32,
-		parameter integer C_S_AXI_ADDR_WIDTH		= 32,
+		parameter integer C_S_AXI_DATA_WIDTH		= 32,	//! AXI lite data width 
+		parameter integer C_S_AXI_ADDR_WIDTH		= 32,	//! AXI lite address width 
 
 		// Parameters of Axi Slave Bus Interface S_AXIS
-		parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
+		parameter integer C_S_AXIS_TDATA_WIDTH	= 32,		//! AXI stream sink data width 
 
 		// Parameters of Axi Master Bus Interface M_AXIS
-		parameter integer C_M_AXIS_TDATA_WIDTH	= 32,
-		parameter integer C_M_AXIS_START_COUNT	= 32
+		parameter integer C_M_AXIS_TDATA_WIDTH	= 32		//! AXI stream source data width 
 	)
 	(
 		// Users to add ports here

@@ -116,8 +116,9 @@ initial begin
     axi_write   (CTRL,  1)          ;            
 
     $display("MODELSIM vs MATLAB")  ;
-    
+
     axi_stream_master(noisy_signal) ;
+
     $stop();
 
 end
@@ -187,6 +188,7 @@ endtask
 
 //// this task works as a driver taking the input stimulus from MATLAB 
 task automatic  axi_stream_master (input logic [15:0] stream_data[NUM_POINTS]);
+    m_axis_tready      =     1'b1     ;
     for ( int i=0 ; i < NUM_POINTS ; i=i+1 )
     begin
         @(posedge s_axis_aclk)

@@ -349,22 +349,15 @@ module my_fir_v1_0_S_AXI #
 	// and the slave is ready to accept the read address.
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
 
-	always @(*)					
+	always @(*)		
     begin
-		if (axi_araddr == CTRL) 
-		begin
-			reg_data_out = ctrl_reg;
-		end	
-		else	
-        for (reg_index = 1; reg_index <= TAPS; reg_index = reg_index + 1) 
-        begin
-            if (axi_araddr == reg_index) 
-            begin
-                reg_data_out = coef_slv_reg[reg_index][FILTER_DATA_WIDTH-1:0];
-            end
-            else
-			 reg_data_out = ctrl_reg;            
-        end
+    if (slv_reg_rden)
+        if (axi_araddr == 0)
+            reg_data_out = ctrl_reg ;
+        else
+            reg_data_out = coef_slv_reg[axi_araddr][FILTER_DATA_WIDTH-1:0];
+    else
+        reg_data_out = 0 ;
     end
 
 	// Output register or memory read data
@@ -395,7 +388,7 @@ FIR_transposed #(	.TAPS(TAPS),
 )
 u_filter 
 (	.clk			(S_AXIS_ACLK) 							, 
-	.resetn		(S_AXIS_ARESETN) 							, 
+	.resetn			(S_AXIS_ARESETN) 						, 
 	.noisy_signal	(S_AXIS_TDATA[FILTER_DATA_WIDTH-1:0]) 	, 
 	.filtered_signal(M_AXIS_TDATA[FILTER_DATA_WIDTH*2-1:0])	,
 	.coeff			(coef_slv_reg [1:TAPS])
