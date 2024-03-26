@@ -111,8 +111,8 @@ module my_fir_v1_0_S_AXI #
 	//-- Signals for user logic register space example
 	//------------------------------------------------
 	//-- Number of Slave Registers 128
-	reg [C_S_AXI_DATA_WIDTH-1:0]	ctrl_reg ;
-	reg [FILTER_DATA_WIDTH-1:0]		coef_slv_reg [1:TAPS];
+	reg        [C_S_AXI_DATA_WIDTH-1:0]	 	ctrl_reg ;
+	reg signed [FILTER_DATA_WIDTH-1:0]		coef_slv_reg [1:TAPS];
 	wire	 slv_reg_rden;
 	wire	 slv_reg_wren;
 	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
@@ -354,13 +354,16 @@ module my_fir_v1_0_S_AXI #
 		if (axi_araddr == CTRL) 
 		begin
 			reg_data_out = ctrl_reg;
-		end		
+		end	
+		else	
         for (reg_index = 1; reg_index <= TAPS; reg_index = reg_index + 1) 
         begin
             if (axi_araddr == reg_index) 
             begin
                 reg_data_out = coef_slv_reg[reg_index][FILTER_DATA_WIDTH-1:0];
             end
+            else
+			 reg_data_out = ctrl_reg;            
         end
     end
 

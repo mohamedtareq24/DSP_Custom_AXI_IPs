@@ -58,7 +58,7 @@ int		        coef_slv_reg_addrs  ;
 int             tb_addr             ;
 int             tb_data             ;
 
-logic [15:0] fir_coeffs             [TAPS];
+logic [15:0] fir_coeffs             [1:TAPS];
 logic [15:0] noisy_signal           [NUM_POINTS];
 logic [15:0] filtered_noisy_signal  [NUM_POINTS];
 
@@ -99,7 +99,7 @@ initial begin
     for (coef_slv_reg_addrs = 1; coef_slv_reg_addrs <= TAPS+1 ; coef_slv_reg_addrs = coef_slv_reg_addrs + 1) 
     begin                                                                           /// addrs generation 
         tb_addr     =   coef_slv_reg_addrs              ;                
-        tb_data     =   fir_coeffs[coef_slv_reg_addrs-1];     
+        tb_data     =   fir_coeffs[coef_slv_reg_addrs];     
         // Write data to address
         axi_write(tb_addr, tb_data);
         #MM_CLKPER;
@@ -110,8 +110,6 @@ initial begin
     #MM_CLKPER;      
     axi_read    (CTRL,  0)          ;
 
-    #(MM_CLKPER * 10)  ;  
-    stream_reset()  ;
     #(MM_CLKPER * 10)  ;
     
     //START the filter 
@@ -191,7 +189,7 @@ endtask
 task automatic  axi_stream_master (input logic [15:0] stream_data[NUM_POINTS]);
     for ( int i=0 ; i < NUM_POINTS ; i=i+1 )
     begin
-        @(posedge s_axi_aclk)
+        @(posedge s_axis_aclk)
         s_axis_tdata     <=     noisy_signal[i]             ;
         s_axis_tstrb     <=     4'b1111                     ;
         s_axis_tlast     <=     1'b0                        ;
