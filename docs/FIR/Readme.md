@@ -23,7 +23,7 @@
 ### **VIVADO IPI**
 ![alt text](image-1.png)
 ![alt text](image-7.png)
-### ** SYSTEM ILA** 
+### **SYSTEM ILA** 
 ![alt text](image.png)  
 
 
