@@ -228,7 +228,7 @@ module my_fir_v1_0_S_AXI #
 	if ( S_AXI_ARESETN == 1'b0 )
         begin
 			ctrl_reg 	<=	0	; 
-            for (reg_index = 0; reg_index <= TAPS; reg_index = reg_index + 1)
+            for (reg_index = 1; reg_index <= TAPS; reg_index = reg_index + 1)
                 coef_slv_reg[reg_index] <= 1;
         end 
     else if (slv_reg_wren) 
@@ -349,7 +349,7 @@ module my_fir_v1_0_S_AXI #
 	// and the slave is ready to accept the read address.
 	assign slv_reg_rden = axi_arready & S_AXI_ARVALID & ~axi_rvalid;
 
-	always @(*)
+	always @(*)					
     begin
 		if (axi_araddr == CTRL) 
 		begin

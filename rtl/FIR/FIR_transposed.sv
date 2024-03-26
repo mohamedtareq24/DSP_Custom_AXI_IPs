@@ -9,10 +9,10 @@ module FIR_transposed(clk , resetn , noisy_signal , filtered_signal , coeff);
 	output 	signed [2*DATA_WIDTH-1:0] 		  filtered_signal; 	    //output signal of the fir 
 	//output 	signed [DATA_WIDTH-1:0] 		filtered_signal; 	      //output signal of the fir 
 	
-	input   signed  [DATA_WIDTH-1:0]          coeff           [0:TAPS-1];
+	input   signed  [DATA_WIDTH-1:0]          coeff           [1:TAPS];
 	wire    signed  [2*DATA_WIDTH-1:0]        summed_signal   [0:TAPS-1];
 
-	assign summed_signal[0] = $signed(noisy_signal * coeff[TAPS-1]);
+	assign summed_signal[0] = $signed(noisy_signal * coeff[TAPS]);
 	
   genvar i;
   generate
@@ -21,7 +21,7 @@ module FIR_transposed(clk , resetn , noisy_signal , filtered_signal , coeff);
           .clk(clk),
           .resetn(resetn),
           .normal_signal(noisy_signal),
-          .coeff(coeff[TAPS-2-i]),
+          .coeff(coeff[TAPS-1-i]),
           .to_register(summed_signal[i]),   // to_register [ 1 , 2 ,3 ]
           .summed_signal(summed_signal[i+1])  // summed_signal [ 1 , 2 , 3 , 4]
         );
