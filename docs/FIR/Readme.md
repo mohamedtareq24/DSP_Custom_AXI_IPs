@@ -96,4 +96,4 @@
 
 # SOFTWARE
 A Unit test software is being developed to fully test the FPGA implementation of the filter using SDK
-The software will include the   `AXI stream FIFO` driver along with basic Memory Mapped using `xil_io.h` operations for configuring the Filter and generating the input noisy data and reading the filtered data using the ILA
+The software will include the   `AXI stream FIFO` driver along with basic Memory Mapped using operations `xil_io`  for configuring the Filter and generating the input noisy data and reading the filtered data using the ILA
