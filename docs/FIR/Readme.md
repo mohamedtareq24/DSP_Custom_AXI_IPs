@@ -26,6 +26,9 @@
 ### **SYSTEM ILA** Probing the AXI Bus between th Zynq PS and The Filter 
 ![alt text](image.png)  
 
+### **Project Summary**
+#### The used clock period is 10ns with 4.39ns +ve setup slack without pipelinig the DSP48 slices  
+![alt text](image-9.png)
 
 
 # HDL Documentation
