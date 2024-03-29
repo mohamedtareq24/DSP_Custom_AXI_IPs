@@ -15,8 +15,11 @@
 ### MATLAB 
 ![alt text](image-6.png)
 ### Questasim
-![alt text](image-10.png)
+AXI Lite signals 
+![alt text](image-11.png)
 
+AXI Stream and Filterd Signal
+![alt text](image-13.png)
 ## C. FPGA Implementation 
 
 ### The filter was packaged as a Custom AXI IP & prototyped on the ZYNQ US+ MPSoC AVNET U96 Board as a part of the PL controlled by the ARM Cortex A53 PS
