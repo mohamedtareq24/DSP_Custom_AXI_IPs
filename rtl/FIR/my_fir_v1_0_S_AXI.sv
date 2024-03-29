@@ -111,13 +111,13 @@ module my_fir_v1_0_S_AXI #
 	//-- Signals for user logic register space example
 	//------------------------------------------------
 	//-- Number of Slave Registers 128
-	reg        [C_S_AXI_DATA_WIDTH-1:0]	 	ctrl_reg ;
-	reg signed [FILTER_DATA_WIDTH-1:0]		coef_slv_reg [1:TAPS];
-	wire	 slv_reg_rden;
-	wire	 slv_reg_wren;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
-	integer	 byte_index;
-	reg	 aw_en;
+	reg        	[C_S_AXI_DATA_WIDTH-1:0]	 	ctrl_reg ;
+	reg signed 	[FILTER_DATA_WIDTH-1:0]			coef_slv_reg [1:TAPS];
+	wire	 									slv_reg_rden;
+	wire	 									slv_reg_wren;
+	reg 		[C_S_AXI_DATA_WIDTH-1:0]		reg_data_out;
+	integer	 									byte_index;
+	reg	 										aw_en;
 
 
 	// I/O Connections assignments
@@ -180,7 +180,7 @@ module my_fir_v1_0_S_AXI #
 	        if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID && aw_en)
 	        begin
 	          // Write Address latching 
-	            axi_awaddr <= S_AXI_AWADDR;
+	            axi_awaddr <= S_AXI_AWADDR >> 2 ;
 	        end
 	    end 
 	end       
@@ -304,7 +304,7 @@ module my_fir_v1_0_S_AXI #
 	          // indicates that the slave has acceped the valid read address
 	          axi_arready <= 1'b1;
 	          // Read address latching
-	          axi_araddr  <= S_AXI_ARADDR;
+	          axi_araddr  <= S_AXI_ARADDR >> 2;
 	        end
 	      else
 	        begin

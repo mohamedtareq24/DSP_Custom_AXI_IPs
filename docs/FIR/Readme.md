@@ -15,7 +15,7 @@
 ### MATLAB 
 ![alt text](image-6.png)
 ### Questasim
-![alt text](image-2.png)
+![alt text](image-10.png)
 
 ## C. FPGA Implementation 
 

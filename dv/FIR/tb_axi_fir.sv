@@ -96,7 +96,7 @@ initial begin
     $display("TESTING WRITING & READING ");
 
     /////// SWEEPING ALL SLAVE REGs
-    for (coef_slv_reg_addrs = 1; coef_slv_reg_addrs <= TAPS+1 ; coef_slv_reg_addrs = coef_slv_reg_addrs + 1) 
+    for (coef_slv_reg_addrs = 1; coef_slv_reg_addrs < TAPS+1 ; coef_slv_reg_addrs = coef_slv_reg_addrs + 1) 
     begin                                                                           /// addrs generation 
         tb_addr     =   coef_slv_reg_addrs              ;                
         tb_data     =   fir_coeffs[coef_slv_reg_addrs];     
@@ -132,7 +132,7 @@ input [C_S_AXI_DATA_WIDTH - 1 : 0] data;
 int                                write_err ;
 begin
     s_axi_wdata     = data;
-    s_axi_awaddr    = addr;
+    s_axi_awaddr    = addr << 2;
     s_axi_awvalid   = 1;
     s_axi_wvalid    = 1;
     s_axi_bready    = 0;
@@ -146,7 +146,7 @@ begin
     s_axi_wvalid    =   0;
     s_axi_bready    =   1;
     #MM_CLKPER;
-    if (dut.my_fir_v1_0_S_AXI_inst.coef_slv_reg[tb_addr] !== tb_data)
+    if (dut.my_fir_v1_0_S_AXI_inst.coef_slv_reg[addr] !== tb_data)
     begin
         $display("Error: Mismatch in AXI4 write at %x: , Wrote Data = %x, Read Data = %x",
         tb_addr, tb_data, dut.my_fir_v1_0_S_AXI_inst.coef_slv_reg[tb_addr]);
@@ -162,7 +162,7 @@ input [C_S_AXI_ADDR_WIDTH - 1 : 0]  addr;
 input [C_S_AXI_DATA_WIDTH - 1 : 0]  expected_data;
 int                                 read_err;     
 begin
-    s_axi_araddr    = addr;
+    s_axi_araddr    = addr << 2;
     s_axi_arvalid   = 1;
     s_axi_rready    = 1;
     s_axi_arprot    = 0;
