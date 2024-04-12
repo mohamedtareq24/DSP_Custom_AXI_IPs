@@ -18,10 +18,11 @@ volatile uint32_t *base_address = (volatile uint32_t *)0xA0000000;
 #define NUM_COEFFS (sizeof(filter_coeffs) / sizeof(filter_coeffs[0]))
 
 // Function to initialize the FIR filter
-void my_fir_filter_init() {
+int my_fir_filter_init() {
     // Write filter coefficients to memory
     my_fir_filter_write_coeffs();
     // Add any additional initialization code here if needed
+return compare_coeffs()
 }
 
 // Function to write filter coefficients to memory
@@ -32,7 +33,25 @@ void my_fir_filter_write_coeffs() {
     }
 }
 
-
+int compare_coeffs() {
+    int i;
+    int *ReadCoeffs = (int *)base_address; // Pointer to the read coefficients
+    int error_count = 0;
+    
+    // Compare the read coefficients with the original coefficients
+    for (i = 1; i < NUM_COEFFS ; i++) {
+        if (ReadCoeffs[i]!= filter_coeffs[i]) {
+            xil_printf("Mismatch at index %d: expected %d, got %d\r\n", i, OriginalCoeffs[i], ReadCoeffs[i]);
+            error_count++;
+        }
+        if (error_count > 0) {
+            xil_printf("Total number of mismatches: %d\r\n", error_count);
+            return XST_FAILURE;
+        }
+    }
+    return XST_SUCCESS;
+}
+/// @brief Start the filter by setting the LSB of the control register.
 void start_filter() {
 	*base_address = 1 ;
 }
