@@ -49,7 +49,7 @@ int RxReceive(XLlFifo *InstancePtr, u32 *DestinationAddr);
  * Device instance definitions
  */
 XLlFifo TXFifo ;
-XLlFifo RXFifo ; 
+XLlFifo RXFifo ;
 
 u32 SourceBuffer[MAX_DATA_BUFFER_SIZE * WORD_SIZE];
 u32 DestinationBuffer[MAX_DATA_BUFFER_SIZE * WORD_SIZE];
@@ -90,20 +90,20 @@ int main()
 		xil_printf("No config found for Tx %d\r\n", TX_FIFO_DEV_ID);
 		return XST_FAILURE;
 	}
-	Status = XLlFifo_CfgInitialize(TXFifo, Config, Config->BaseAddress);
+	Status = XLlFifo_CfgInitialize(&TXFifo, Config, Config->BaseAddress);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Tx Initialization failed\n\r");
 		return Status;
 	}
 
 /// Resetting TX ISR
-	Status = XLlFifo_Status(TXFifo);
-	XLlFifo_IntClear(TXFifo,0xffffffff);
-	Status = XLlFifo_Status(TXFifo);
+	Status = XLlFifo_Status(&TXFifo);
+	XLlFifo_IntClear(&TXFifo,0xffffffff);
+	Status = XLlFifo_Status(&TXFifo);
 	if(Status != 0x0) {
 		xil_printf("\n ERROR : Reset value of TX FIFO ISR0 : 0x%x\t"
 					"Expected : 0x0\n\r",
-					XLlFifo_Status(TXFifo));
+					XLlFifo_Status(&TXFifo));
 		return XST_FAILURE;
 	}
 
@@ -115,20 +115,20 @@ int main()
 		return XST_FAILURE;
 	}
 
-	Status = XLlFifo_CfgInitialize(RXFifo, Config, Config->BaseAddress);
+	Status = XLlFifo_CfgInitialize(&RXFifo, Config, Config->BaseAddress);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Rx Initialization failed\n\r");
 		return Status;
 	}
 
 //Resetting RX ISR 
-	Status = XLlFifo_Status(RXFifo);
-	XLlFifo_IntClear(RXFifo,0xffffffff);
-	Status = XLlFifo_Status(RXFifo);
+	Status = XLlFifo_Status(&RXFifo);
+	XLlFifo_IntClear(&RXFifo,0xffffffff);
+	Status = XLlFifo_Status(&RXFifo);
 	if(Status != 0x0) {
 		xil_printf("\n ERROR : Reset value of RX FIFO ISR0 : 0x%x\t"
 					"Expected : 0x0\n\r",
-					XLlFifo_Status(RXFifo));
+					XLlFifo_Status(&RXFifo));
 		return XST_FAILURE;
 	}
 
@@ -136,17 +136,17 @@ int main()
 // Generate the Noisy data , and set up the buffers source and destination
 // for now lets go with some DATA from a LUT until I make something based on DDS 
 
-	int noisy_data[] = {} 	; 
-	int expected_filtered_data[] = {}	;
-	int filtered_data [] ;
+	u32 noisy_data[] = {} 	;
+	u32 expected_filtered_data[] = {}	;
+	u32 filtered_data [] = {} ;
 
-	Status = TxSend(TXFifo, noisy_data);
+	Status = TxSend(&TXFifo, noisy_data);
 	if (Status != XST_SUCCESS){
 		xil_printf("Transmisson of Data failed\n\r");
 		return XST_FAILURE;
 	}
 
-	Status = RxReceive(RXFifo, filtered_data);
+	Status = RxReceive(&RXFifo, filtered_data);
 	if (Status != XST_SUCCESS){
 		xil_printf("Receiving data failed");
 		return XST_FAILURE;
@@ -156,7 +156,7 @@ int main()
 
 	/* Compare the expected vs received */
 	xil_printf(" Comparing data ...\n\r");
-	for( i=0 ; i<MAX_DATA_BUFFER_SIZE ; i++ ){
+	for(int i=0 ; i<MAX_DATA_BUFFER_SIZE ; i++ ){
 		if ( *(filtered_data + i) != *(expected_filtered_data + i) ){
 			Error = 1;
 			break;

@@ -22,7 +22,8 @@ int my_fir_filter_init() {
     // Write filter coefficients to memory
     my_fir_filter_write_coeffs();
     // Add any additional initialization code here if needed
-return compare_coeffs()
+     // Return the result of compare_coeffs
+    return compare_coeffs() ;
 }
 
 // Function to write filter coefficients to memory
@@ -41,7 +42,7 @@ int compare_coeffs() {
     // Compare the read coefficients with the original coefficients
     for (i = 1; i < NUM_COEFFS ; i++) {
         if (ReadCoeffs[i]!= filter_coeffs[i]) {
-            xil_printf("Mismatch at index %d: expected %d, got %d\r\n", i, OriginalCoeffs[i], ReadCoeffs[i]);
+            xil_printf("Mismatch at index %d: expected %d, got %d\r\n", i, filter_coeffs[i], ReadCoeffs[i]);
             error_count++;
         }
         if (error_count > 0) {
