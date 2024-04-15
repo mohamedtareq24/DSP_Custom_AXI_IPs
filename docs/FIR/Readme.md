@@ -58,17 +58,18 @@ The `fir_test.c` file
 # HDL Documentation
 ## Module my_fir_v1_0 
 ## Diagram
-![Diagram](my_fir_v1_0.svg "Diagram")
+![Diagram](../../rtl/FIR/my_fir_v1_0.svg "Diagram")
 ## Parameters
 
-| Parameter name       | Type    | Value | Description                          |
-| -------------------- | ------- | ----- | ------------------------------------ |
-| TAPS                 |         | 53    | FIlter Order+1                       |
-| FILTER_DATA_WIDTH    |         | 16    | Fixed point data width of the filter |
-| C_S_AXI_DATA_WIDTH   | integer | 32    | AXI lite data width                  |
-| C_S_AXI_ADDR_WIDTH   | integer | 32    | AXI lite address width               |
-| C_S_AXIS_TDATA_WIDTH | integer | 32    | AXI stream sink data width           |
-| C_M_AXIS_TDATA_WIDTH | integer | 32    | AXI stream source data width         |
+| Paramter name        | Type    | Value        | Description                          |
+| -------------------- | ------- | ------------ | ------------------------------------ |
+| TAPS                 |         | 53           | FIlter Order+1                       |
+| FILTER_DATA_WIDTH    |         | 16           | Fixed point data width of the filter |
+| C_S_AXI_DATA_WIDTH   | integer | 32           | AXI lite data width                  |
+| C_S_AXI_ADDR_WIDTH   | integer | 32           | AXI lite address width               |
+| C_S_AXIS_TDATA_WIDTH | integer | 32           | AXI stream sink data width           |
+| C_M_AXIS_TDATA_WIDTH | integer | 32           | AXI stream source data width         |
+| BASE_ADDR            | integer | 32'hA0000000 | AXI lite Base Address                |
 
 ## AXI Wrapper
 ### AXI Lite

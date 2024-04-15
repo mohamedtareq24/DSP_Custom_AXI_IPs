@@ -18,7 +18,7 @@
 
 		// Parameters of Axi Master Bus Interface M_AXIS
 		parameter integer C_M_AXIS_TDATA_WIDTH	= 32,		//! AXI stream source data width 
-		parameter integer BASE_ADDR				= 32'hA0000000
+		parameter integer BASE_ADDR				= 32'hA0000000 //! AXI lite Base Address
 	)
 	(
 		// Users to add ports here
