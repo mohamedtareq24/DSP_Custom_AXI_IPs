@@ -10,7 +10,7 @@ parameter  	    MM_CLKPER       =   100 ;
 parameter       STREAM_CLKPER   =   10  ;
 parameter       CTRL            =   0   ;
 parameter       TAPS            =   53  ;
-
+parameter       BASE_ADDR       =   32'hA0000000;
 logic                                           s_axi_aclk;
 logic                                           s_axi_aresetn;
 logic       [C_S_AXI_ADDR_WIDTH-1 : 0]          s_axi_awaddr;
@@ -87,7 +87,9 @@ initial begin
     m_axis_aresetn  =   1   ;
     s_axis_aresetn  =   1   ;
     m_axis_tready   =   0   ;
-    
+
+    s_axis_tvalid   =   0   ;   
+    s_axis_tlast    =   0   ;
     ///////////////////////////////////////////////////// RESETTING 
     mm_reset()          ;
     stream_reset()      ;   
@@ -132,7 +134,7 @@ input [C_S_AXI_DATA_WIDTH - 1 : 0] data;
 int                                write_err ;
 begin
     s_axi_wdata     = data;
-    s_axi_awaddr    = addr << 2;
+    s_axi_awaddr    = BASE_ADDR + (addr << 2)  ;
     s_axi_awvalid   = 1;
     s_axi_wvalid    = 1;
     s_axi_bready    = 0;
@@ -162,7 +164,7 @@ input [C_S_AXI_ADDR_WIDTH - 1 : 0]  addr;
 input [C_S_AXI_DATA_WIDTH - 1 : 0]  expected_data;
 int                                 read_err;     
 begin
-    s_axi_araddr    = addr << 2;
+    s_axi_araddr    = BASE_ADDR + (addr << 2);
     s_axi_arvalid   = 1;
     s_axi_rready    = 1;
     s_axi_arprot    = 0;
@@ -196,6 +198,8 @@ task automatic  axi_stream_master (input logic [15:0] stream_data[NUM_POINTS]);
         s_axis_tstrb     <=     4'b1111                     ;
         s_axis_tlast     <=     1'b0                        ;
         s_axis_tvalid    <=     1'b1                        ;      // driving slave valid 
+        if (i == NUM_POINTS-1)   
+            s_axis_tlast    <=  1'b1;
         wait(s_axis_tready)                                 ;                                   
         #STREAM_CLKPER                                      ;
     end

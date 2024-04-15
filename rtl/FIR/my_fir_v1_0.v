@@ -17,7 +17,8 @@
 		parameter integer C_S_AXIS_TDATA_WIDTH	= 32,		//! AXI stream sink data width 
 
 		// Parameters of Axi Master Bus Interface M_AXIS
-		parameter integer C_M_AXIS_TDATA_WIDTH	= 32		//! AXI stream source data width 
+		parameter integer C_M_AXIS_TDATA_WIDTH	= 32,		//! AXI stream source data width 
+		parameter integer BASE_ADDR				= 32'hA0000000
 	)
 	(
 		// Users to add ports here
@@ -77,7 +78,8 @@
 		.C_S_AXI_ADDR_WIDTH		(C_S_AXI_ADDR_WIDTH),
 		.C_M_AXIS_TDATA_WIDTH	(C_S_AXIS_TDATA_WIDTH),
 		.TAPS					(TAPS),
-		.FILTER_DATA_WIDTH		(FILTER_DATA_WIDTH)
+		.FILTER_DATA_WIDTH		(FILTER_DATA_WIDTH),
+		.BASE_ADDR				(BASE_ADDR)
 	) my_fir_v1_0_S_AXI_inst (
 		.S_AXI_ACLK		(s_axi_aclk),
 		.S_AXI_ARESETN	(s_axi_aresetn),
@@ -127,7 +129,8 @@
 
 // Instantiation of Axi Bus Interface M_AXIS
 	my_fir_v1_0_M_AXIS # ( 
-		.C_M_AXIS_TDATA_WIDTH(C_M_AXIS_TDATA_WIDTH)
+		.C_M_AXIS_TDATA_WIDTH(C_M_AXIS_TDATA_WIDTH),
+		.TAPS(TAPS)
 	) my_fir_v1_0_M_AXIS_inst (
 		.M_AXIS_ACLK(m_axis_aclk),
 		.M_AXIS_ARESETN(m_axis_aresetn),
@@ -137,7 +140,8 @@
 		.M_AXIS_TLAST(m_axis_tlast),
 		.M_AXIS_TREADY(m_axis_tready),
 		.stream_data_in(filter_out),
-		.en(en)
+		.en(s_axis_tvalid & s_axis_tready),
+		.last(s_axis_tlast)
 	);
 
 	// Add user logic here

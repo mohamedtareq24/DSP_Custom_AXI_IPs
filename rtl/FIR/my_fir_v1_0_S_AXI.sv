@@ -11,7 +11,8 @@ module my_fir_v1_0_S_AXI #
 		// Width of S_AXI data bus
 		parameter integer C_S_AXI_DATA_WIDTH	= 32,
 		// Width of S_AXI address bus
-		parameter integer C_S_AXI_ADDR_WIDTH	= 9
+		parameter integer C_S_AXI_ADDR_WIDTH	= 32,
+		parameter integer BASE_ADDR				= 'hA0000000
 	)
 	(
 		// Users to add ports here
@@ -180,7 +181,7 @@ module my_fir_v1_0_S_AXI #
 	        if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID && aw_en)
 	        begin
 	          // Write Address latching 
-	            axi_awaddr <= S_AXI_AWADDR >> 2 ;
+	            axi_awaddr <= (S_AXI_AWADDR- BASE_ADDR) >> 2 ;
 	        end
 	    end 
 	end       
@@ -229,7 +230,7 @@ module my_fir_v1_0_S_AXI #
         begin
 			ctrl_reg 	<=	0	; 
             for (reg_index = 1; reg_index <= TAPS; reg_index = reg_index + 1)
-                coef_slv_reg[reg_index] <= 1;
+                coef_slv_reg[reg_index] <= 0;
         end 
     else if (slv_reg_wren) 
         begin
@@ -304,7 +305,7 @@ module my_fir_v1_0_S_AXI #
 	          // indicates that the slave has acceped the valid read address
 	          axi_arready <= 1'b1;
 	          // Read address latching
-	          axi_araddr  <= S_AXI_ARADDR >> 2;
+	          axi_araddr  <= (S_AXI_ARADDR - BASE_ADDR) >> 2;
 	        end
 	      else
 	        begin

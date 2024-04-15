@@ -3,7 +3,8 @@
 	module my_fir_v1_0_M_AXIS #
 	(
 		// Users to add parameters here
-        parameter SIGNALWIDTH = 16 ,
+        parameter SIGNALWIDTH 	= 	16 	,
+		parameter TAPS			=	53	,
 		// User parameters ends
 		// Do not modify the parameters beyond this line
 
@@ -14,6 +15,7 @@
 		// Users to add ports here
         input wire [2*SIGNALWIDTH-1:0]    	stream_data_in 	,
 		input wire							en 				,
+		input wire 							last			,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -43,7 +45,8 @@
 	//FIFO implementation signals
 	reg [C_M_AXIS_TDATA_WIDTH-1 : 0] 	stream_data_out;
 	wire  	tx_en;
-
+	reg valid_shift_reg 	[TAPS-1:0];
+	reg last_shift_reg	 	[TAPS-1:0];
 
 
 	// I/O Connections assignments
@@ -54,10 +57,48 @@
 	assign M_AXIS_TSTRB		= {(C_M_AXIS_TDATA_WIDTH/8){1'b1}};
 
 	//tvalid generation
-	assign axis_tvalid = en ;
+	always @(posedge M_AXIS_ACLK)
+	begin
+		if (!M_AXIS_ARESETN)                                                                         
+		begin   
+			for (int i = 0; i < TAPS; i = i + 1) 
+			begin
+				valid_shift_reg[i] <= 0;
+			end
+		end
+		else
+		begin
+			for (int i = TAPS-1; i > 0; i = i - 1) 
+			begin
+				valid_shift_reg[i] <= valid_shift_reg[i-1];
+			end
+			valid_shift_reg[0] <= en;
+		end
+	end
+	assign axis_tvalid = valid_shift_reg[TAPS-1] ;
 
-	// AXI tlast generation                                                                                                                                   
-	assign axis_tlast = 1'b0	;                             
+
+	// AXI tlast generation  
+		//tvalid generation
+	always @(posedge M_AXIS_ACLK)
+	begin
+		if (!M_AXIS_ARESETN)                                                                         
+		begin   
+			for (int i = 0; i < TAPS; i = i + 1) 
+			begin
+				last_shift_reg[i] <= 0;
+			end
+		end
+		else
+		begin
+			for (int i = TAPS-1; i > 0; i = i - 1) 
+			begin
+				last_shift_reg[i] <= last_shift_reg[i-1];
+			end
+			last_shift_reg[0] <= last;
+		end
+	end                                                                                                                            
+	assign axis_tlast = last_shift_reg[TAPS-1]	;                             
 
 	// Delay the axis_tvalid and axis_tlast signal by one clock cycle                              
 	// to match the latency of M_AXIS_TDATA                                                        
@@ -83,7 +124,7 @@
 		begin                                            
 			if(!M_AXIS_ARESETN)                            
 			begin                                        
-				stream_data_out <= 1;                      
+				stream_data_out <= 0;                      
 			end                                          
 			else if (tx_en)// && M_AXIS_TSTRB[byte_index]  
 			begin                                        
