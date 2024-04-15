@@ -20,18 +20,39 @@ AXI Lite signals
 
 AXI Stream and Filterd Signal
 ![alt text](image-13.png)
-## C. FPGA Implementation 
+## C. FPGA Implementation & Testing
+<img src="image-17.png" alt="alt_text" width="800" height="">
 
 ### The filter was packaged as a Custom AXI IP & prototyped on the ZYNQ US+ MPSoC AVNET U96 Board as a part of the PL controlled by the ARM Cortex A53 PS
 ### **VIVADO IPI**
 ![alt text](image-1.png)
 ![alt text](image-7.png)
-### **SYSTEM ILA** Probing the AXI Bus between th Zynq PS and The Filter 
-![alt text](image.png)  
+### **SYSTEM ILA** 
+#### Probing the AXI Bus between th Zynq PS and The Filter & the Filter Master & Slave AXI stream Bus 
+![alt text](image-15.png)
+![alt text](image-14.png) 
 
-### **Project Summary**
+### **Perfomance**
 #### The used clock period is 10ns with 4.39ns +ve setup slack without pipelinig the DSP48 slices  
 ![alt text](image-9.png)
+
+
+# TEST SOFTWARE
+A unit test software was developed to fully test the FPGA implementation of the filter using direct register read/write for the 2 FIFOs and the Filter. The software includes `my_fir_filter.h`, which has `u32 fir_init()` that 
+* Writes the FIR coefficients to the filter
+* Starts the filter 
+* Reads the coefficients back
+thus testing the AXI Lite filter interface. 
+
+The `fir_test.c` file 
+* Initializes the Tx and Rx FIFOs
+* Sends a MATLAB-generated noisy sin signal
+* Reads the Rx FIFO output and compares it to the MATLAB-generated output, reporting any mismatches.
+
+# Test Results 
+![alt text](image-16.png)
+### No Mismacthes between MATLAB and the FIR filter output read by the ARM A53
+
 
 
 # HDL Documentation
@@ -40,7 +61,7 @@ AXI Stream and Filterd Signal
 ![Diagram](my_fir_v1_0.svg "Diagram")
 ## Parameters
 
-| Generic name         | Type    | Value | Description                          |
+| Parameter name       | Type    | Value | Description                          |
 | -------------------- | ------- | ----- | ------------------------------------ |
 | TAPS                 |         | 53    | FIlter Order+1                       |
 | FILTER_DATA_WIDTH    |         | 16    | Fixed point data width of the filter |
@@ -96,7 +117,3 @@ AXI Stream and Filterd Signal
 | m_axis_tstrb   | output    | wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] |             |
 | m_axis_tlast   | output    | wire                                  |             |
 | m_axis_tready  | input     | wire                                  |             |
-
-# SOFTWARE
-A Unit test software is being developed to fully test the FPGA implementation of the filter using SDK
-The software will include the   `AXI stream FIFO` driver along with basic Memory Mapped using operations `xil_io`  for configuring the Filter and generating the input noisy data and reading the filtered data using the ILA
