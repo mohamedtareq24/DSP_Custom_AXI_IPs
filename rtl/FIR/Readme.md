@@ -2,6 +2,14 @@
 
 # Module: my_fir_v1_0 
 - **File**: my_fir_v1_0.v
+## Register Space 
+| Register Name | Description                             | Size (bits) | Address (Hex) |
+|---------------|-----------------------------------------|-------------|---------------|
+| CTRL          | Control register                        | 1           | BASE_ADDR     |
+| Coefficient 0 | Filter coefficient 0                    | FILTER_DATA_WIDTH | BASE_ADDR + 0x4 |
+| Coefficient 1 | Filter coefficient 1                    | FILTER_DATA_WIDTH | BASE_ADDR + 0x8 |
+| ...           | ...                                     | ...         | ...           |
+| Coefficient TAPS | Filter coefficient N                    | FILTER_DATA_WIDTH | BASE_ADDR + 4*TAPS |
 
 ## Diagram
 ![Diagram](my_fir_v1_0.svg "Diagram")

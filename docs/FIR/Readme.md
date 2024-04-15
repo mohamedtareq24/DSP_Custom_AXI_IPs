@@ -1,4 +1,5 @@
 # A Generic Custom Transposed Form FIR Filter AXI IP with parametrizable order & Signal Width
+
 # HARDWARE 
 ## A. DESIGN 
 ![alt text](image-3.png) 
@@ -48,6 +49,15 @@ The `fir_test.c` file
 * Initializes the Tx and Rx FIFOs
 * Sends a MATLAB-generated noisy sin signal
 * Reads the Rx FIFO output and compares it to the MATLAB-generated output, reporting any mismatches.
+
+## Register Space 
+| Register Name | Description                             | Size (bits) | Address (Hex) |
+|---------------|-----------------------------------------|-------------|---------------|
+| CTRL          | Control register                        | 1           | BASE_ADDR     |
+| Coefficient 0 | Filter coefficient 0                    | FILTER_DATA_WIDTH | BASE_ADDR + 0x4 |
+| Coefficient 1 | Filter coefficient 1                    | FILTER_DATA_WIDTH | BASE_ADDR + 0x8 |
+| ...           | ...                                     | ...         | ...           |
+| Coefficient TAPS | Filter coefficient N                    | FILTER_DATA_WIDTH | BASE_ADDR + 4*TAPS |
 
 # Test Results 
 ![alt text](image-16.png)
