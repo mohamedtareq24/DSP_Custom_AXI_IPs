@@ -12,3 +12,4 @@ dv/FIR/questasim/
 
 docs/DDS/
 .vscode/
+./rtl/dds
